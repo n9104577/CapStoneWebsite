@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+
+{% load staticfiles %}
+<html>
+	<head>
+		{% block head %}
+			<title>squash</title>
+			<link rel="stylesheet" href="/static/css/style.css">
+		{% endblock %}
+	</head>
+	<body>
+		{% block body %}
+			<h3>Base template error. Please contact an administrator.</h3>
+		{% endblock %}
+		<footer>
+			© 2018 ASA
+		</footer>
+	</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+
+<!-- Informs Django's template engine that we will be using
+		 static files within the template -->
+{% load staticfiles %}
+
+<html lang="en">
+
+	<!----------------------- Head element ----------------------->
+	<head>
+    {% block title %}<title>squash</title>{% endblock %}
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- CSS -->
+		<link rel="stylesheet" href="/static/css/style.css">
+
+	</head>
+
+     	<!------------------------- The body -------------------------->
+	<body>
+
+		<main>
+			<h1>squash</h1>
+			<hr>
+			
+		<!------------------- Begin Registration & Login ------------------->
+			<div class="form">
+
+
+		<!-------------------- Registration form -------------------->
+				<h4>Or register below to use Smart City</h4>
+
+				<form  method="POST">
+					{% if form.errors %}
+						{% for field in form %}
+							{% for error in field.errors %}
+								<div class="alert alert-danger">
+								<strong>{{ error|escape }}</strong>
+								</div>
+							{% endfor %}
+						{% endfor %}
+						{% for error in form.non_field_errors %}
+							<div class="alert alert-danger">
+							<strong>{{ error|escape }}</strong>
+							</div>
+						{% endfor %}
+					{% endif %}
+					{% if register_password_message != NULL %}
+					<div class="alert alert-danger">
+							<strong>{{ register_password_message|escape }}</strong>
+					</div>
+					{% endif %}
+					{% csrf_token %}
+					<div class="split-row">
+						<div class="field-wrap">
+							{{ form.first_name }}
+						</div>
+
+						<div class="field-wrap">
+							{{ form.last_name }}
+						</div>
+					</div>
+
+					<div class="split-row">
+						<div class="field-wrap">
+							{{ form.username }}
+						</div>
+
+						<div class="field-wrap">
+							<label for="form.usertype">
+								Preference<span class="req">*</span>
+							</label>
+							{{ form.usertype }}
+						</div>
+					</div>
+
+					<div class="field-wrap">
+						{{ form.email }}
+						
+					</div>
+
+					<div class="field-wrap">
+						{{ form.password }}
+					</div>
+
+					<div class="field-wrap">
+						{{ form.password_confirm }}
+					</div>
+
+					<button type="submit" class="button button-block" value="Register" name="Register"/>Register</button>
+				</form>
+
+			</div>
+		<!------------------- End Registration & Login ------------------->
+		</main>
+		<footer>
+			© 2018 ASA
+		</footer>
+	</body>
+</html>

@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "multiObjectTracking", "multiObjectTracking\multiObjectTracking.pyproj", "{FF2A059D-2FFF-4185-95AF-24D4DFC125DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF2A059D-2FFF-4185-95AF-24D4DFC125DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2A059D-2FFF-4185-95AF-24D4DFC125DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C2AE55F7-CDC3-49A0-BD59-60B06714705B}
+	EndGlobalSection
+EndGlobal

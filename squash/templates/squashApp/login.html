@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<!-- Informs Django's template engine that we will be using
+		 static files within the template -->
+{% load staticfiles %}
+
+<html lang="en">
+
+	<!----------------------- Head element ----------------------->
+	<head>
+    {% block title %}<title>squash</title>{% endblock %}
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- CSS -->
+		<link rel="stylesheet" href="/static/css/RegistrationStyle.css">
+
+	</head>
+
+     	<!------------------------- The body -------------------------->
+	<body>
+
+		<main>
+			<h1>squash</h1>
+			<hr>
+			
+		<!------------------- Begin Registration & Login ------------------->
+			<div class="form">
+
+				<div id="login">
+				<h4>Login here</h4>
+					<form method="post">
+
+						{% if login_message  != NULL %}
+						<div class="alert alert-danger">
+								<strong>{{ login_message |escape }}</strong>
+						</div>
+						{% endif %}
+
+						{% csrf_token %}
+						<div class="field-wrap">
+							{{form.username}}
+						</div>
+
+						<div class="field-wrap">
+							{{form.password}}
+						</div>
+
+						<button type="submit" class="button button-block" value="login" name="Login"/>Log In</button>
+					</form>
+				</div>
+			</div>
+				
+		<!------------------- End Registration & Login ------------------->
+		</main>
+		<footer>
+			© 2018 ASA
+		</footer>
+	</body>
+</html>

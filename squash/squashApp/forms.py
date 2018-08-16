@@ -43,5 +43,15 @@ class RegistrationForm(forms.ModelForm):
 
 # login form 
 class LoginForm(forms.Form):
-    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'Username*'}))
-    password = forms.CharField(max_length=128, widget=forms.PasswordInput(attrs={'placeholder': 'Password*'}))
+	username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'Username*'}))
+	password = forms.CharField(max_length=128, widget=forms.PasswordInput(attrs={'placeholder': 'Password*'}))
+
+	class Meta:
+		model = SquashUser
+		fields = ['username', 'password']
+		
+		
+		
+		
+		
+		

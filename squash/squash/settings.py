@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 AUTH_USER_MODEL = 'squashApp.SquashUser'
 
 
+LOGOUT_REDIRECT_URL = '/'
+
 
 
 # Application definition

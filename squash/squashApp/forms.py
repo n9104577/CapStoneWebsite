@@ -1,5 +1,5 @@
 from django import forms
-from squashApp.models import SquashUser
+from squashApp.models import SquashUser, Video
 
 
 
@@ -51,7 +51,11 @@ class LoginForm(forms.Form):
 		fields = ['username', 'password']
 		
 		
-		
+class VideoForm(forms.ModelForm):
+    class Meta:
+        model= Video
+        fields= ["name", "videofile"]
+
 		
 		
 		

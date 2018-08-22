@@ -49,6 +49,13 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 	
 	
+# for video upload
+from django.shortcuts import render
+from .models import Video
+from .forms import VideoForm
+	
+# import tracking script	
+from squashApp.HSVTracking import main
 # User RegistrationForm
 def register(request):
 	form = RegistrationForm()
@@ -128,10 +135,55 @@ def loginView(request):
 
 @login_required	
 def video(request):
-	return render(request, 'squashApp/homepage.html')
+	if(Video.objects.last() != None):
+		lastvideo= Video.objects.last()
 
+		videofile= lastvideo.videofile
+		
+	
+	form= VideoForm(request.POST or None, request.FILES or None)
+	if form.is_valid():
+		form.save()
+		return HttpResponseRedirect('/processedVideo')
+	if(Video.objects.last() == None):
+		context= {'form': form}
+	else:
+		lastvideo= Video.objects.last()
+
+		videofile= lastvideo.videofile	
+		context= {'videofile': videofile,'form': form}
+		
+		
+	return render(request, 'squashApp/homepage.html', context)
+
+def processedVideo(request):
+	if(Video.objects.last() != None):
+		lastvideo= Video.objects.last()
+
+		videofile= lastvideo.videofile
+		main(videofile.url[1:])
+		
+	
+	if(Video.objects.last() == None):
+		context= {}
+	else:
+		lastvideo= Video.objects.last()
+
+		videofile= lastvideo.videofile	
+		context= {'videofile': videofile}
+		
+		
+	return render(request, 'squashApp/homepage1.html', context)
+
+		
+	
+	
 	
 @login_required
 def logout(request):
 	db.connections.close_all()
 	logout(request)
+
+
+
+

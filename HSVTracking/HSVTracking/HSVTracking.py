@@ -1,5 +1,4 @@
 import cv2
-import time
 import numpy as np
 
 def chooseColours(HSVframe):
@@ -94,3 +93,4 @@ def main():
 if __name__ == "__main__":
     main()
     cv2.destroyAllWindows()
+    

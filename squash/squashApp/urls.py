@@ -6,7 +6,8 @@ from django.contrib.auth.views import login, logout
 urlpatterns = [
     
 	path('register/', views.register, name='register'),
-	path('register/squashApp/login', views.loginView, name='login'),
+	path('squashApp/register', views.register, name='register'),
+	path('squashApp/login', views.loginView, name='login'),
 	path('video', views.video, name='video'),
 	path('processedVideo', views.processedVideo, name='processedVideo'),	
 	path('', views.register, name='register'),

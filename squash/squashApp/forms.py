@@ -52,9 +52,14 @@ class LoginForm(forms.Form):
 		
 		
 class VideoForm(forms.ModelForm):
-    class Meta:
-        model= Video
-        fields= ["name", "videofile"]
+	name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'name*'}))
+	player1 = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'player1*'}))
+	player2 = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'player2*'}))
+	
+
+	class Meta:
+		model= Video
+		fields= ["name", "player1", "player2", "videofile"]
 
 		
 		

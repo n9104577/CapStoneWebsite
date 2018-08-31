@@ -11,7 +11,7 @@ main {
 
 h1 {
   text-align: center;
-  color: #ed0000;
+  color: #393F44;
   margin: 0;
   font-family:"BrandonGrotW01Light";
   font-size: 70px;
@@ -20,7 +20,7 @@ h1 {
 
 h2 {
   text-align: center;
-  color: #ed0000;
+  color: #393F44;
   margin: 0;
   font-family:"Impact",Charcoal,sans-serif;
   font-size: 48px;
@@ -64,7 +64,7 @@ html {
 }
 
 body {
-  background: #ed0000;
+  background: #E5F1F1;
   font-family: 'Titillium Web', sans-serif;
 }
 
@@ -261,7 +261,7 @@ input, textarea {
   background: none;
   background-image: none;
   border: 1px solid #a0b3b0;
-  color: #ed0000;
+  color: #ffffff;
   border-radius: 0;
   -webkit-transition: border-color .25s ease, box-shadow .25s ease;
   transition: border-color .25s ease, box-shadow .25s ease;
@@ -308,7 +308,7 @@ textarea {
   text-transform: uppercase;
   letter-spacing: .1em;
   background: #1ab188;
-  color: #ed0000;
+  color: #ffffff;
   -webkit-transition: all 0.5s ease;
   transition: all 0.5s ease;
   -webkit-appearance: none;

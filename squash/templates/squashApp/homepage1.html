@@ -3,20 +3,24 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Upload Videos</title>
+<link rel="stylesheet" href="/static/css/RegistrationStyle.css">
+<title>Show Proccesed Video</title>
 </head>
 <body>
+<h1>Show Proccesed Video</h1>
+<div class="form">
 
-<h1>Video Uploader</h1>
 
 
 <br><br>
-<video width='400' controls>
+<div class="field-wrap">
+<video width='560' controls>
 <source src='{{ MEDIA_URL }}{{ videofile }}' type='video/mp4'>
 Your browser does not support the video tag.
 </video>
+</div>
 <br><br>
 </p>
-
+</div>
 </body>
 </html>

@@ -84,7 +84,7 @@ def register(request):
 				# return to the homepage so the user can login, set form1 to form so the users username is already entered.
 				# and they know it was successful
 				return HttpResponseRedirect('squashApp/login', {'form': form})
-				return render(request, 'squashApp/login.html', {'form': form})
+				
 				
 			# else return a message saying the passwords dont match
 			elif form.data['password'] != form.data['password_confirm']:
@@ -155,7 +155,7 @@ def video(request):
 		
 		
 	return render(request, 'squashApp/homepage.html', context)
-
+@login_required	
 def processedVideo(request):
 	if(Video.objects.last() != None):
 		lastvideo= Video.objects.last()

@@ -45,7 +45,9 @@ class SquashUser(AbstractBaseUser, PermissionsMixin):
 	
 	
 class Video(models.Model):
-	name= models.CharField(max_length=500)
+	name= models.CharField(_('name'), max_length=500)
+	player1 = models.CharField(_('player1'), max_length=500)
+	player2 = models.CharField(_('player2'), max_length=500)
 	videofile= models.FileField(upload_to='videos/', null=True, verbose_name="")
 
 	def __str__(self):

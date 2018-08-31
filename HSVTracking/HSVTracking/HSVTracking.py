@@ -36,7 +36,6 @@ def findContours(Pframe, frame):
 
     # Approximate contours to polygons + get bounding rects and circles
     contours_poly = [None]*len(contours)
-    boundRect = [None]*len(contours)
     centers = [None]*len(contours)
     radius = [None]*len(contours)
     for i, c in enumerate(contours):

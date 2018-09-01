@@ -1,26 +1,26 @@
-{% load staticfiles %}
-<!DOCTYPE html>
+{% extends 'base.html' %}
+
 <html>
-<head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="/static/css/RegistrationStyle.css">
-<title>Show Proccesed Video</title>
-</head>
-<body>
-<h1>Show Proccesed Video</h1>
-<div class="form">
-
-
-
-<br><br>
-<div class="field-wrap">
-<video width='560' controls>
-<source src='{{ MEDIA_URL }}{{ videofile }}' type='video/mp4'>
-Your browser does not support the video tag.
-</video>
-</div>
-<br><br>
-</p>
-</div>
-</body>
+	{% block head %}
+		<head>			
+			<title>Show Proccesed Video</title>
+			<h1>Show Proccesed Video</h1>
+		</head>
+	{% endblock%}
+	
+	{% block body %}
+		<body>
+			
+			<div class="form">
+				<br><br>
+				<div class="field-wrap">
+					<video width='560' controls>
+						<source src='{{ MEDIA_URL }}{{ videofile }}' type='video/mp4'>
+						Your browser does not support the video tag.
+					</video>
+				</div>
+				<br><br>				
+			</div>
+		</body>
+	{% endblock%}
 </html>

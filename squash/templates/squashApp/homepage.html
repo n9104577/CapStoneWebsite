@@ -1,45 +1,39 @@
-{% load staticfiles %}
-<!DOCTYPE html>
+{% extends 'base.html' %}
+
 <html>
-<head>
-<meta charset="UTF-8">
-<link rel="stylesheet" href="/static/css/RegistrationStyle.css">
-<title>Upload Videos</title>
-</head>
-<body>
-<h1>Video Uploader</h1>
-<div class="form">
+	{% block head %}
+		<head>				
+			<title>Upload Videos</title>
+			<h1>Video Uploader</h1>
+		</head>
+	{% endblock %}
 
-<form enctype="multipart/form-data" method="POST" action="">
-{% csrf_token %}
+	{% block body %}
+		<body>
+			<div class="form">
 
-						<div class="field-wrap">
-							{{ form.name }}
-						</div>
+				<form enctype="multipart/form-data" method="POST" action="">
+					{% csrf_token %}
+					<div class="field-wrap">
+						{{ form.name }}
+					</div>
 
-						<div class="field-wrap">
-							{{ form.player1 }}
-						</div>
-				
+					<div class="field-wrap">
+						{{ form.player1 }}
+					</div>
+			
+					<div class="field-wrap">
+						{{ form.player2 }}
+					</div>
 
-				
-						<div class="field-wrap">
-							{{ form.player2 }}
-						</div>
-
-						<div class="field-wrap">
-							{{ form.videofile }}
-						</div>
-						
-						
-				
-<input type="submit" value="Upload"/>
-</form>
-
-<br><br>
-
-<br><br>
-</p>
-</div>
-</body>
+					<div class="field-wrap">
+						{{ form.videofile }}
+					</div>		
+					
+					<input type="submit" value="Upload"/>
+				</form>
+				<br><br>				
+			</div>
+		</body>
+	{% endblock %}
 </html>

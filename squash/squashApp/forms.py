@@ -1,12 +1,5 @@
 from django import forms
-from squashApp.models import SquashUser, Video
-
-
-
-
-
-
-
+from squashApp.models import SquashUser, Video, videoData, playerData
 
 
 
@@ -49,18 +42,34 @@ class LoginForm(forms.Form):
 	class Meta:
 		model = SquashUser
 		fields = ['username', 'password']
-		
-		
+
+
+
 class VideoForm(forms.ModelForm):
 	name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'name*'}))
-	player1 = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'player1*'}))
-	player2 = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'player2*'}))
-	
-
+	player1 = forms.ModelChoiceField(queryset=playerData.objects.all(), empty_label="Player 1")
+	player2 = forms.ModelChoiceField(queryset=playerData.objects.all(), empty_label="Player 2")
+	player1.label_from_instance = lambda obj: "{0} {1}".format(obj.first_name, obj.last_name)
+	player2.label_from_instance = lambda obj: "{0} {1}".format(obj.first_name, obj.last_name)
 	class Meta:
 		model= Video
 		fields= ["name", "player1", "player2", "videofile"]
 
 		
 		
-		
+class searchVideoForm(forms.Form):
+	searchVideo = forms.CharField(max_length=150, required=False, widget=forms.TextInput(attrs={'placeholder': 'Search Video...'}))
+	searchPlayer = forms.CharField(max_length=150, required=False, widget=forms.TextInput(attrs={'placeholder': 'Search Player...'}))
+	
+	class Meta:
+		model = videoData
+		fields=['name', 'player1', 'player2']
+	
+class searchPlayerForm(forms.Form):
+	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'First Name*'}))
+	last_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Last Name*'}))
+	country = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'Country*'}))
+	
+	class Meta:
+		model = playerData
+		fields=['playerId','first_name','last_name','country']

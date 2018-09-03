@@ -1,7 +1,7 @@
 import cv2
 import time
 import numpy as np
-from squashApp.models import Video
+from squashApp.models import Video, videoData
 def chooseColours(HSVframe):
     # Select Region
     r = cv2.selectROI("Pick Colour", HSVframe)
@@ -56,10 +56,10 @@ def findContours(Pframe, frame):
     # Return Frame
     return frame, Pframe
 
-def main(fileName):
+def main(videoFile, videoName, videoObject):
 	colours = []
 	# loop over the image paths
-	cap = cv2.VideoCapture(fileName)
+	cap = cv2.VideoCapture(videoFile)
 
 	# cap = cv2.VideoCapture(0)
 	cap.set(cv2.CAP_PROP_FPS, 60)
@@ -67,11 +67,13 @@ def main(fileName):
 
 	# Get current width of frame
 	width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)   # float
-# Get current height of frame
+	# Get current height of frame
 	height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT) # float
-	# Define the codec and create VideoWriter object
+	videoName = videoName + "Processed"
+	filePath = 'media/processedVideos/' + videoName + '.mp4'
 	
-	out = cv2.VideoWriter('media/test.mp4',-1, 20.0, (int(width),int(height)))
+	# Define the codec and create VideoWriter object
+	out = cv2.VideoWriter(filePath,-1, 20.0, (int(width),int(height)))
 	while True:
 		success, frame = cap.read()
 		if not success: break
@@ -101,8 +103,11 @@ def main(fileName):
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 	out.release()
-	data = {'name' : 'test.mp4', 'videofile' : 'test.mp4'}
-	Video.objects.create(**data)
+	filePath = filePath[5:]
+	data = {'videoId': videoObject, 'name' : videoName, 'processedVideoFile' : filePath}
+	videoData.objects.create(**data)
+	
+	
 	print("done")
 
 if __name__ == "__main__":

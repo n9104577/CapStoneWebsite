@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+<html>
+	{% block head %}
+		<head>			
+			
+			<title>Show Proccesed Video</title>
+			<h1>Show Proccesed Video</h1>
+		</head>
+	{% endblock%}
+	
+	{% block body %}
+		<body>
+			
+			<div class="form">
+				<br><br>
+				<div class="field-wrap">
+					<table> 
+						<tr>
+							<th>ID</th>
+							<th>Name</th>
+							<th>country</th>							
+						</tr>
+											
+							<tr>
+							<td class="t1">{{ player.playerId}}</td>
+							<td class="t2">{{ player.get_full_name }}</td>	
+							<td class="t2">{{ player.country }}</td>							
+						</tr>				
+					</table>
+				</div>
+				<br><br>				
+			</div>
+		</body>
+	{% endblock%}
+</html>

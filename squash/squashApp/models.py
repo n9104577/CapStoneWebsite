@@ -45,8 +45,35 @@ class SquashUser(AbstractBaseUser, PermissionsMixin):
 	
 	
 class Video(models.Model):
-	name= models.CharField(max_length=500)
+	videoId = models.AutoField(primary_key=True)
+	name= models.CharField(_('name'), max_length=500)
+	player1 = models.CharField(_('player1'), max_length=500)
+	player2 = models.CharField(_('player2'), max_length=500)
 	videofile= models.FileField(upload_to='videos/', null=True, verbose_name="")
 
 	def __str__(self):
 		return self.name + ": " + str(self.videofile)
+	
+	
+
+class videoData(models.Model):
+	videoDataId = models.AutoField(primary_key=True)
+	videoId = models.ForeignKey('Video', on_delete=models.CASCADE)
+	name = models.CharField(_('name'), max_length = 500)
+	processedVideoFile = models.FileField(upload_to='processedVideos/', null=True, verbose_name="")
+	
+class playerData(models.Model):
+	playerId = models.AutoField(primary_key=True)
+	first_name = models.CharField(_('first name'), max_length=30, blank=False)
+	last_name = models.CharField(_('last name'), max_length=30, blank=False)
+	country = models.CharField(_('country'), max_length=30, blank=False)
+	
+	def __unicode__(self):
+		return '%s %s' % (self.first_name, self.last_name)
+
+
+
+
+
+
+

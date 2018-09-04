@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 # Create your views here.
 
 #import forms
-from squashApp.forms import RegistrationForm, LoginForm
+from squashApp.forms import RegistrationForm, LoginForm, searchVideoForm,searchPlayerForm
 
 
 # Import Password
@@ -40,14 +40,15 @@ from django import db, template
 from django.contrib.admin import AdminSite
 
 # users, forms and models
-from squashApp.models import SquashUser
+from squashApp.models import SquashUser, playerData
 
 from squashApp import models
 from django.conf.urls import url
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 User = get_user_model()
-	
+from itertools import chain	
+from itertools import groupby
 	
 # for video upload
 from django.shortcuts import render
@@ -84,7 +85,7 @@ def register(request):
 				# return to the homepage so the user can login, set form1 to form so the users username is already entered.
 				# and they know it was successful
 				return HttpResponseRedirect('squashApp/login', {'form': form})
-				return render(request, 'squashApp/login.html', {'form': form})
+				
 				
 			# else return a message saying the passwords dont match
 			elif form.data['password'] != form.data['password_confirm']:
@@ -135,6 +136,7 @@ def loginView(request):
 
 @login_required	
 def video(request):
+	
 	if(Video.objects.last() != None):
 		lastvideo= Video.objects.last()
 
@@ -144,7 +146,12 @@ def video(request):
 	form= VideoForm(request.POST or None, request.FILES or None)
 	if form.is_valid():
 		form.save()
-		return HttpResponseRedirect('/processedVideo')
+		videoObject= Video.objects.last()
+		videofile= videoObject.videofile
+		videoName = lastvideo.name
+		main(videofile.url[1:], videoName, videoObject)
+		
+		return HttpResponseRedirect('/videoSelection')
 	if(Video.objects.last() == None):
 		context= {'form': form}
 	else:
@@ -155,27 +162,103 @@ def video(request):
 		
 		
 	return render(request, 'squashApp/homepage.html', context)
+	
+	
+# @login_required	
+# def processedVideo(request):
+	# if(Video.objects.last() != None):
+		# lastvideo= Video.objects.last()
 
-def processedVideo(request):
-	if(Video.objects.last() != None):
-		lastvideo= Video.objects.last()
-
-		videofile= lastvideo.videofile
-		main(videofile.url[1:])
+		# videofile= lastvideo.videofile
+		# main(videofile.url[1:])
 		
 	
-	if(Video.objects.last() == None):
-		context= {}
-	else:
-		lastvideo= Video.objects.last()
+	# if(Video.objects.last() == None):
+		# context= {}
+	# else:
+		# lastvideo= Video.objects.last()
 
-		videofile= lastvideo.videofile	
-		context= {'videofile': videofile}
+		# videofile= lastvideo.videofile	
+		# context= {'videofile': videofile}
 		
 		
-	return render(request, 'squashApp/homepage1.html', context)
+	# return render(request, 'squashApp/homepage1.html', context)
 
+@login_required	
+def videoSelection(request):
+	form = searchVideoForm()
+	showSearch = False
+	videoList = models.Video.objects.all()
+	if 'search' in request.POST:
+		searchVideo = request.POST['searchVideo']
+		searchPlayer = request.POST['searchPlayer']
 		
+		nameList = models.Video.objects.filter(name=searchVideo).values()
+		player1List = models.Video.objects.filter(player1=searchPlayer).values()
+		player2List = models.Video.objects.filter(player2=searchPlayer).values()
+		List = list(chain(nameList, player1List, player2List))
+		videoList = [rows.__next__() for (key, rows) in groupby(List, key=lambda obj: Video.videoId)]
+		showSearch = True
+	
+	if(len(videoList) < 1):
+		videoList = models.Video.objects.all()
+		showSearch = False
+	
+	
+	
+	
+	context = {
+		'username': request.user.username,
+		'videoList': videoList,
+		'form': form,
+		'showSearch': showSearch
+	}
+	
+	return render(request, 'squashApp/videoSelection.html', context)		
+
+@login_required		
+def videoData(request, videoId):
+	video = models.videoData.objects.get(videoId_id=videoId)
+	videofile = video.processedVideoFile
+	
+	context= {'videofile': videofile}
+	
+	return render(request, 'squashApp/videoData.html', context)
+
+@login_required		
+def playerSelection(request):
+	form = searchPlayerForm()
+	showSearch = False
+	playerList = models.playerData.objects.all()
+	if 'search' in request.POST:		
+		searchPlayer = request.POST['searchPlayer']
+		
+		playerList = models.playerData.objects.filter(get_full_name=searchPlayer).values()		
+		showSearch = True
+	
+	if(len(playerList) < 1):
+		playerList = models.playerData.objects.all()
+		showSearch = False
+	context = {
+		'username': request.user.username,
+		'playerList': playerList,
+		'form': form,
+		'showSearch': showSearch
+	}
+	
+	return render(request, 'squashApp/playerSelection.html', context)
+	
+	
+@login_required		
+def playerData(request, playerId):
+	player = models.playerData.objects.get(playerId=playerId)
+
+	context= {'player': player}
+	
+	return render(request, 'squashApp/playerData.html', context)
+	
+	
+	
 	
 	
 	

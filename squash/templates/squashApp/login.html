@@ -1,59 +1,43 @@
-<!DOCTYPE html>
-
-<!-- Informs Django's template engine that we will be using
-		 static files within the template -->
-{% load staticfiles %}
+{% extends 'base.html' %}
 
 <html lang="en">
 
-	<!----------------------- Head element ----------------------->
-	<head>
-    {% block title %}<title>squash</title>{% endblock %}
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<!-- CSS -->
-		<link rel="stylesheet" href="/static/css/RegistrationStyle.css">
+	{% block head %}
+		<head>
+			<title>AUSSIE SQUASH MATE!</title>	
+			<meta name="viewport" content="width=device-width, initial-scale=1">
+		</head>
+	{% endblock %}
+	{% block navigation %}{% endblock %}
 
-	</head>
+	{% block body %}
+		<body>
+			<main>
+				<h1>AUSSY SQUASH MATE!</h1>
+				<hr>
+				<div class="form">
+					<div id="login">
+						<h4>Login here</h4>
+						<form method="post">
+							{% if login_message  != NULL %}
+								<div class="alert alert-danger">
+									<strong>{{ login_message |escape }}</strong>
+								</div>
+							{% endif %}
 
-     	<!------------------------- The body -------------------------->
-	<body>
-
-		<main>
-			<h1>squash</h1>
-			<hr>
-			
-		<!------------------- Begin Registration & Login ------------------->
-			<div class="form">
-
-				<div id="login">
-				<h4>Login here</h4>
-					<form method="post">
-
-						{% if login_message  != NULL %}
-						<div class="alert alert-danger">
-								<strong>{{ login_message |escape }}</strong>
-						</div>
-						{% endif %}
-
-						{% csrf_token %}
-						<div class="field-wrap">
-							{{form.username}}
-						</div>
-
-						<div class="field-wrap">
-							{{form.password}}
-						</div>
-
-						<button type="submit" class="button button-block" value="login" name="Login"/>Log In</button>
-					</form>
+							{% csrf_token %}
+							<div class="field-wrap">
+								{{form.username}}
+							</div>
+							<div class="field-wrap">
+								{{form.password}}
+							</div>
+							<button type="submit" class="button button-block" value="login" name="Login"/>Log In</button>
+						</form>
+					</div>
 				</div>
-			</div>
-				
-		<!------------------- End Registration & Login ------------------->
-		</main>
-		<footer>
-			© 2018 ASA
-		</footer>
-	</body>
+			</main>		
+		</body>
+	{% endblock %}
+	
 </html>

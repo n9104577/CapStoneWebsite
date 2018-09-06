@@ -146,9 +146,11 @@ def video(request):
 	form= VideoForm(request.POST or None, request.FILES or None)
 	if form.is_valid():
 		form.save()
+		
+		
 		videoObject= Video.objects.last()
 		videofile= videoObject.videofile
-		videoName = lastvideo.name
+		videoName = videoObject.name
 		main(videofile.url[1:], videoName, videoObject)
 		
 		return HttpResponseRedirect('/videoSelection')
@@ -189,6 +191,7 @@ def videoSelection(request):
 	form = searchVideoForm()
 	showSearch = False
 	videoList = models.Video.objects.all()
+	playerList = models.playerData.objects.all()
 	if 'search' in request.POST:
 		searchVideo = request.POST['searchVideo']
 		searchPlayer = request.POST['searchPlayer']
@@ -210,6 +213,7 @@ def videoSelection(request):
 	context = {
 		'username': request.user.username,
 		'videoList': videoList,
+		'playerList': playerList,
 		'form': form,
 		'showSearch': showSearch
 	}

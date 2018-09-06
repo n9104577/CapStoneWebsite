@@ -47,14 +47,16 @@ class SquashUser(AbstractBaseUser, PermissionsMixin):
 class Video(models.Model):
 	videoId = models.AutoField(primary_key=True)
 	name= models.CharField(_('name'), max_length=500)
-	player1 = models.CharField(_('player1'), max_length=500)
-	player2 = models.CharField(_('player2'), max_length=500)
+	player1 = models.ForeignKey('playerData', related_name='player1', on_delete=models.CASCADE)
+	player2 = models.ForeignKey('playerData', related_name='player2', on_delete=models.CASCADE)
+	#player1 = models.CharField(_('player1'), max_length=500)
+	#player2 = models.CharField(_('player2'), max_length=500)
 	videofile= models.FileField(upload_to='videos/', null=True, verbose_name="")
 
 	def __str__(self):
 		return self.name + ": " + str(self.videofile)
-	
-	
+
+
 
 class videoData(models.Model):
 	videoDataId = models.AutoField(primary_key=True)
@@ -70,6 +72,10 @@ class playerData(models.Model):
 	
 	def __unicode__(self):
 		return '%s %s' % (self.first_name, self.last_name)
+		
+	def get_name(self):
+		return '%s %s' % (self.first_name, self.last_name)
+
 
 
 

@@ -35,7 +35,7 @@
 				{% for player in playerList %}					
 					<tr>
 						<td class="t1">{{ player.playerId}}</td>
-						<td class="t2">{{ player.get_full_name }}</td>													
+						<td class="t2">{{ player.get_name }}</td>													
 						<td class="t4"><a class="show" href="{% url 'playerData' playerId=player.playerId %}">Show Data</a></td>
 					</tr>
 					

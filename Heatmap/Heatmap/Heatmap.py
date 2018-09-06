@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 import cv2
 
 # Global
@@ -9,6 +10,7 @@ class Player():
         self.colours = colours
         self.contoursPoly = None
         self.centers = None
+        self.wCenters = None
         self.radius = None
 
     # Thresholds the image using the colours picked by the user
@@ -37,6 +39,16 @@ class Player():
         if area:
             self.contoursPoly = cv2.approxPolyDP(contours[i], 3, True)
             self.centers, self.radius = cv2.minEnclosingCircle(self.contoursPoly)
+
+    def warpPoint(self, h):
+        imagepoint = [self.centers[0], self.centers[1], 1]
+        worldpoint = np.array(np.dot(h, imagepoint))
+        scalar = worldpoint[2]
+        xworld = int((worldpoint[0]/scalar))
+        yworld = int((worldpoint[1]/scalar))
+
+        height = 200
+        self.wCenters = (xworld, yworld + height)
 
 # Picks a selection of colours and averages it
 def chooseColours(HSVframe):
@@ -83,14 +95,14 @@ def computeHomography(frame, court):
     # Find Court Points
     mask = frame
     while True:
-        cv2.imshow('frame', mask)
-        cv2.setMouseCallback('frame', on_mouse_click, mask)
+        cv2.imshow('Pick Points', mask)
+        cv2.setMouseCallback('Pick Points', on_mouse_click, mask)
         for point in courtPoints:
             cv2.circle(mask, tuple(point), 4, (0,0,255), -1)
 
         if (cv2.waitKey(1) & 0xFF == ord('q')) or (len(courtPoints) >= 4):
             break
-    cv2.destroyWindow('frame')
+    cv2.destroyWindow('Pick Points')
 
     height = court.shape[0]
     width = court.shape[1]
@@ -100,26 +112,12 @@ def computeHomography(frame, court):
                       [width, 0], 
                       [width, height], 
                       [0, height]])
-    #while True:
-    #    cv2.imshow('frame', mask)
-    #    for point in dst:
-    #        cv2.circle(mask, tuple(point), 4, (0,0,255), -1)
-    #    if (cv2.waitKey(1) & 0xFF == ord('q')):
-    #        break
        
     return cv2.findHomography(src, dst)
 
 def warpFrame(frame, court, h):
     return cv2.warpPerspective(frame, h, (court.shape[1], court.shape[0]))
 
-def warpPoint(point, h):
-    p = (point[0], point[1], 1)
-
-    p = np.linalg.inv(h) * p
-    p = h * p
-    p = p * (1.0 / p[2])
-
-    return p[0], p[1]
 
 def on_mouse_click (event, x, y, flags, frame):
     if event == cv2.EVENT_LBUTTONUP:
@@ -149,6 +147,7 @@ def main():
 
     while True:
         success, frame = cap.read()
+        cFrame = copy.copy(frame)
         if not success: break
         HSVframe = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
          
@@ -159,18 +158,16 @@ def main():
                 p.findContours(Pframe)
                 
                 # Dev Tracking
-                Pframe = drawContours(frame, p)
+                Pframe = drawContours(cFrame, p)
 
                 # Warp Frame
-                Wframe = warpFrame(frame, court, h)
-                wPoint = warpPoint(p.centers, h)
-                cv2.circle(Wframe, tuple(wPoint), 4, (0,0,255), -1)
-
+                p.warpPoint(h)
+                cv2.circle(court, (p.wCenters[0], p.wCenters[1]), 10, p.colours, -1)
 
                 # HeatMap
                 # Display to User
                 cv2.imshow("Frame", Pframe)
-                cv2.imshow("Warp",  Wframe)
+                cv2.imshow("Warp",  court) 
         else:
             colours = chooseColours(HSVframe)
             if colours:

@@ -55,8 +55,12 @@ from django.shortcuts import render
 from .models import Video
 from .forms import VideoForm
 	
+
+
 # import tracking script	
 from squashApp.HSVTracking import main
+
+
 # User RegistrationForm
 def register(request):
 	form = RegistrationForm()
@@ -151,6 +155,7 @@ def video(request):
 		videoObject= Video.objects.last()
 		videofile= videoObject.videofile
 		videoName = videoObject.name
+		HttpResponseRedirect('squashApp/login.html')
 		main(videofile.url[1:], videoName, videoObject)
 		
 		return HttpResponseRedirect('/videoSelection')
@@ -166,41 +171,25 @@ def video(request):
 	return render(request, 'squashApp/homepage.html', context)
 	
 	
-# @login_required	
-# def processedVideo(request):
-	# if(Video.objects.last() != None):
-		# lastvideo= Video.objects.last()
 
-		# videofile= lastvideo.videofile
-		# main(videofile.url[1:])
-		
 	
-	# if(Video.objects.last() == None):
-		# context= {}
-	# else:
-		# lastvideo= Video.objects.last()
-
-		# videofile= lastvideo.videofile	
-		# context= {'videofile': videofile}
-		
-		
-	# return render(request, 'squashApp/homepage1.html', context)
-
 @login_required	
 def videoSelection(request):
 	form = searchVideoForm()
 	showSearch = False
 	videoList = models.Video.objects.all()
-	playerList = models.playerData.objects.all()
+	
 	if 'search' in request.POST:
 		searchVideo = request.POST['searchVideo']
 		searchPlayer = request.POST['searchPlayer']
 		
-		nameList = models.Video.objects.filter(name=searchVideo).values()
-		player1List = models.Video.objects.filter(player1=searchPlayer).values()
-		player2List = models.Video.objects.filter(player2=searchPlayer).values()
-		List = list(chain(nameList, player1List, player2List))
-		videoList = [rows.__next__() for (key, rows) in groupby(List, key=lambda obj: Video.videoId)]
+		
+		
+		
+		player1List = models.Video.objects.filter(name__icontains=searchVideo, player1=searchPlayer).all()
+		player2List = models.Video.objects.filter(name__icontains=searchVideo, player2=searchPlayer).all()
+		List = list(chain(player1List, player2List))
+		videoList = list(dict.fromkeys(List))
 		showSearch = True
 	
 	if(len(videoList) < 1):
@@ -208,12 +197,11 @@ def videoSelection(request):
 		showSearch = False
 	
 	
-	
+	#print("videoList" + str(videoList))
 	
 	context = {
 		'username': request.user.username,
 		'videoList': videoList,
-		'playerList': playerList,
 		'form': form,
 		'showSearch': showSearch
 	}
@@ -235,9 +223,12 @@ def playerSelection(request):
 	showSearch = False
 	playerList = models.playerData.objects.all()
 	if 'search' in request.POST:		
-		searchPlayer = request.POST['searchPlayer']
+		first = request.POST['first_name']
+		last = request.POST['last_name']
+		p_country = request.POST['country']
 		
-		playerList = models.playerData.objects.filter(get_full_name=searchPlayer).values()		
+		List = models.playerData.objects.filter(first_name__icontains=first, last_name__icontains=last, country__icontains=p_country).all()	
+		playerList = list(dict.fromkeys(List))
 		showSearch = True
 	
 	if(len(playerList) < 1):

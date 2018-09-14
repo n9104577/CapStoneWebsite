@@ -8,7 +8,7 @@ User_Type = (
 		('P', 'Player'),
 	)
 	
-# Used for registering a user
+
 class RegistrationForm(forms.ModelForm):
 	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'First Name*'}))
 	last_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Last Name*'}))
@@ -18,18 +18,12 @@ class RegistrationForm(forms.ModelForm):
 	password = forms.CharField(max_length=128, widget=forms.PasswordInput(attrs={'placeholder': 'Password*'}))
 	password_confirm = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Confirm Password*'}))
 	
-	# assign the form a model to save to and which fields to save
+	
 	class Meta:
 		model = SquashUser
 		fields = ['first_name', 'last_name', 'username', 'usertype',
 		'email', 'password'] # Or list '__all__'
-		#widget = {
-		#'usertype': forms.Select(attrs={'style': 'background-color: blue'}),
-		#}
-		#widgets = {
-		#'password': forms.PasswordInput(),
-		#}
-		#exclude = ['title']
+		
 
 
 
@@ -57,18 +51,26 @@ class VideoForm(forms.ModelForm):
 
 		
 		
+		
 class searchVideoForm(forms.Form):
 	searchVideo = forms.CharField(max_length=150, required=False, widget=forms.TextInput(attrs={'placeholder': 'Search Video...'}))
-	searchPlayer = forms.CharField(max_length=150, required=False, widget=forms.TextInput(attrs={'placeholder': 'Search Player...'}))
+	searchPlayer =forms.ModelChoiceField(queryset=playerData.objects.all(), empty_label="searchPlayer")
+	searchPlayer.label_from_instance = lambda obj: "{0} {1}".format(obj.first_name, obj.last_name)
 	
+	def clean_field(self):
+		data = self.cleaned_data['searchPlayer']
+		if not data:
+			data = 0
+		return data
+
 	class Meta:
 		model = videoData
 		fields=['name', 'player1', 'player2']
 	
 class searchPlayerForm(forms.Form):
-	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'First Name*'}))
-	last_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs={'placeholder': 'Last Name*'}))
-	country = forms.CharField(max_length=50, widget=forms.TextInput(attrs={'placeholder': 'Country*'}))
+	first_name = forms.CharField(max_length=30, required=False, widget=forms.TextInput(attrs={'placeholder': 'First Name*'}))
+	last_name = forms.CharField(max_length=30, required=False, widget=forms.TextInput(attrs={'placeholder': 'Last Name*'}))
+	country = forms.CharField(max_length=50, required=False, widget=forms.TextInput(attrs={'placeholder': 'Country*'}))
 	
 	class Meta:
 		model = playerData

@@ -60,8 +60,8 @@
 					{% for video in videoList %}					
 						<tr>
 							<td class="t1">{{ video.name }}</td>
-							<td class="t2">{{ video.player1 }}</td>	
-							<td class="t3">{{ video.player2 }}</td>							
+							<td class="t2">{{ video.player1.get_name }}</td>	
+							<td class="t3">{{ video.player2.get_name }}</td>							
 							<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">Show Data</a></td>
 						</tr>
 						

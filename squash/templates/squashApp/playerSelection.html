@@ -16,7 +16,13 @@
 				{% csrf_token %}
 			    <div class="split-row">
 					<div class="field-wrap">
-						{{ form.searchPlayer }}
+						{{ form.first_name }}
+					</div>
+					<div class="field-wrap">
+						{{ form.last_name }}
+					</div>
+					<div class="field-wrap">
+						{{ form.country }}
 					</div>
 				</div>	
 				<button type="submit" class="button button-block" value="search" name="search"/>search</button>				

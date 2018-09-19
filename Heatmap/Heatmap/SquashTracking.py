@@ -5,6 +5,8 @@ import cv2
 # Global
 courtPoints = []
 
+court = cv2.imread('court.jpg') # put back into main after testing findControlPoints
+ 
 class Player():
     def __init__(self, colours=None):
         self.colours = colours
@@ -13,7 +15,7 @@ class Player():
         self.wCenters = None
         self.points = []
         self.radius = None
-
+        self.controlPoints = []
     # Thresholds the image using the colours picked by the user
     def thresholdImage(self, image, tolerance):
         # Pick Colours
@@ -50,6 +52,21 @@ class Player():
 
         height = 200
         self.wCenters = (xworld, yworld + height)
+
+
+
+# find points inside the center T circle
+def findControlPoints(p, T_CIRCLE):
+    x = p.wCenters[0]
+    y = p.wCenters[1]
+    if (x - T_CIRCLE[0])**2 + (y - T_CIRCLE[1])**2 < T_CIRCLE[2]**2:
+        # inside circle
+        p.controlPoints.append(1)
+        cv2.circle(court, (int(x), int(y)), int(5), (0,0,255), thickness=1, lineType=8, shift=0) # remove after testing
+    else:
+        p.controlPoints.append(0)
+        cv2.circle(court, (int(x), int(y)), int(5), (255,0,0), thickness=1, lineType=8, shift=0) # remove after testing
+            
 
 # Picks a selection of colours and averages it
 def chooseColours(HSVframe):
@@ -147,8 +164,9 @@ def main():
     Players = []
     # loop over the image paths
     cap = cv2.VideoCapture("squash2.mp4")
-    court = cv2.imread('court.jpg')
+    #court = cv2.imread('court.jpg') 
 
+    
     # cap = cv2.VideoCapture(0)
     cap.set(cv2.CAP_PROP_FPS, 60)
     success, frame = cap.read()
@@ -165,6 +183,13 @@ def main():
     accumImage = np.zeros((court.shape[0], court.shape[1]), np.uint8)
     h, status = computeHomography(frame, court)
 
+
+
+    # x, y center points and radius for the 'T' position   T_CIRCLE = [x, y, radius]
+    T_CIRCLE = [np.size(court, 1)*.5, np.size(court, 0)*0.56, np.size(court,1)*0.234] 
+    cv2.circle(court, (int(T_CIRCLE[0]), int(T_CIRCLE[1])), int(T_CIRCLE[2]), cv2.COLOR_BGR2HSV, thickness=1, lineType=8, shift=0) #remove after testing
+    cv2.imshow("court", court) # remove after testing
+    
     while True:
         success, frame = cap.read()
         cFrame = copy.copy(frame)
@@ -183,22 +208,38 @@ def main():
                 # Warp Frame
                 p.warpPoint(h)
                 #cv2.warpPerspective(frame, h, (court.shape[1], court.shape[0]))
-                
-                accumImage = genHeatmap(p, accumImage)
-                heatmap = cv2.applyColorMap(accumImage, cv2.COLORMAP_JET)
-                heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
+                findControlPoints(p, T_CIRCLE)
+
+                # Commented out just for checking inside T functionality 
+##                accumImage = genHeatmap(p, accumImage)
+##                heatmap = cv2.applyColorMap(accumImage, cv2.COLORMAP_JET)
+##                heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
 
                 # HeatMap
                 # Display to User
                 cv2.imshow("Frame", Pframe)
-                cv2.imshow("Warp",  heatmap) 
+                #cv2.imshow("Warp",  heatmap)
+
+                # just to visually check findControlPoints is working
+                cv2.imshow("Court", court)
+
+            
         else:
             colours = chooseColours(HSVframe)
             if colours:
                 Players.append(Player(colours))
 
+
+
+        
         if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+    # calculate and print percentage time in center T position
+    for p in Players:
+        numPoints = len(p.controlPoints)
+        numInT = p.controlPoints.count(1)
+        print(p.controlPoints)
+        print("time in T", str((numInT / numPoints)*100))
 
 if __name__ == "__main__":
     main()

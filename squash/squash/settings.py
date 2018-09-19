@@ -29,7 +29,7 @@ SECRET_KEY = 'bi((-0#72)4evhy3+0pbt81-c-55b$(7714$$_rbaa=zxa3ah='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 # Create own user model
 AUTH_USER_MODEL = 'squashApp.SquashUser'
@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 	'squashApp',
-    'jquery',
 
 	
 ]

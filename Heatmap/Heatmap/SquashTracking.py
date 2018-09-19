@@ -11,6 +11,7 @@ class Player():
         self.contoursPoly = None
         self.centers = None
         self.wCenters = None
+        self.points = []
         self.radius = None
 
     # Thresholds the image using the colours picked by the user
@@ -115,9 +116,28 @@ def computeHomography(frame, court):
        
     return cv2.findHomography(src, dst)
 
-def warpFrame(frame, court, h):
-    return cv2.warpPerspective(frame, h, (court.shape[1], court.shape[0]))
+def genHeatmap(p, accumImage):
+    x = p.wCenters[0]
+    y = p.wCenters[1]
+    if (x <= 0) or (y <= 0): return accumImage
+    kernal =  [[0, 0, 0, 6, 6, 6, 0, 0, 0],
+                [0, 0, 6, 6, 7, 6, 6, 0, 0],
+                [0, 6, 6, 7, 8, 7, 6, 6, 0],
+                [6, 6, 7, 8, 9, 8, 7, 6, 6],
+                [6, 7, 8, 9, 9, 9, 8, 7, 6],
+                [6, 6, 7, 8, 9, 8, 7, 6, 6],
+                [0, 6, 6, 7, 8, 7, 6, 6, 0],
+                [0, 0, 6, 6, 7, 6, 6, 0, 0],
+                [0, 0, 0, 6, 6, 6, 0, 0, 0]]
 
+    kernal = np.dot(kernal, 5)
+
+    eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
+    eImg[y:y+9, x:x+9] = kernal
+        
+    accumImage = eImg + accumImage
+
+    return accumImage
 
 def on_mouse_click (event, x, y, flags, frame):
     if event == cv2.EVENT_LBUTTONUP:
@@ -142,7 +162,7 @@ def main():
     #    # Default 1
     #    noPlayers = 1
     noPlayers = 1
-
+    accumImage = np.zeros((court.shape[0], court.shape[1]), np.uint8)
     h, status = computeHomography(frame, court)
 
     while True:
@@ -150,7 +170,7 @@ def main():
         cFrame = copy.copy(frame)
         if not success: break
         HSVframe = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-         
+
         if len(Players) >= noPlayers:
             for p in Players:
                 Pframe = p.thresholdImage(HSVframe, 35)
@@ -162,12 +182,16 @@ def main():
 
                 # Warp Frame
                 p.warpPoint(h)
-                cv2.circle(court, (p.wCenters[0], p.wCenters[1]), 10, p.colours, -1)
+                #cv2.warpPerspective(frame, h, (court.shape[1], court.shape[0]))
+                
+                accumImage = genHeatmap(p, accumImage)
+                heatmap = cv2.applyColorMap(accumImage, cv2.COLORMAP_JET)
+                heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
 
                 # HeatMap
                 # Display to User
                 cv2.imshow("Frame", Pframe)
-                cv2.imshow("Warp",  court) 
+                cv2.imshow("Warp",  heatmap) 
         else:
             colours = chooseColours(HSVframe)
             if colours:

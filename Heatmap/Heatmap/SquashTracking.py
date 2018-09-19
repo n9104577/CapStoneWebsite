@@ -62,11 +62,27 @@ def findControlPoints(p, T_CIRCLE):
     if (x - T_CIRCLE[0])**2 + (y - T_CIRCLE[1])**2 < T_CIRCLE[2]**2:
         # inside circle
         p.controlPoints.append(1)
-        cv2.circle(court, (int(x), int(y)), int(5), (0,0,255), thickness=1, lineType=8, shift=0) # remove after testing
+       # cv2.circle(court, (int(x), int(y)), int(5), (0,0,255), thickness=1, lineType=8, shift=0) # remove after testing
     else:
         p.controlPoints.append(0)
-        cv2.circle(court, (int(x), int(y)), int(5), (255,0,0), thickness=1, lineType=8, shift=0) # remove after testing
-            
+       # cv2.circle(court, (int(x), int(y)), int(5), (255,0,0), thickness=1, lineType=8, shift=0) # remove after testing
+
+
+def createKernal(radius):
+    
+    x = 0
+    y = 0
+    kernal = np.zeros((radius,radius))
+    mid = int((radius-1)/ 2)    
+    for r in range (1, mid+1, 1):        
+        for x in range(0, int(radius/2+0.5)):        
+            for y in range(0, radius):
+                if (mid-x)**2 + (mid-y)**2 < (abs(mid+1-r))**2:
+                    kernal[x][y] = r
+                    kernal[radius-1-x][y] = r
+    return kernal
+
+    
 
 # Picks a selection of colours and averages it
 def chooseColours(HSVframe):
@@ -133,28 +149,23 @@ def computeHomography(frame, court):
        
     return cv2.findHomography(src, dst)
 
-def genHeatmap(p, accumImage):
+
+
+
+def genHeatmap(p, accumImage, kernal):
     x = p.wCenters[0]
     y = p.wCenters[1]
     if (x <= 0) or (y <= 0): return accumImage
-    kernal =  [[0, 0, 0, 6, 6, 6, 0, 0, 0],
-                [0, 0, 6, 6, 7, 6, 6, 0, 0],
-                [0, 6, 6, 7, 8, 7, 6, 6, 0],
-                [6, 6, 7, 8, 9, 8, 7, 6, 6],
-                [6, 7, 8, 9, 9, 9, 8, 7, 6],
-                [6, 6, 7, 8, 9, 8, 7, 6, 6],
-                [0, 6, 6, 7, 8, 7, 6, 6, 0],
-                [0, 0, 6, 6, 7, 6, 6, 0, 0],
-                [0, 0, 0, 6, 6, 6, 0, 0, 0]]
-
+    if (x > accumImage.shape[1]- kernal.shape[1]) or (y > accumImage.shape[0]-(kernal.shape[0])): return accumImage
+    
     kernal = np.dot(kernal, 5)
-
     eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
-    eImg[y:y+9, x:x+9] = kernal
-        
-    accumImage = eImg + accumImage
+    eImg[y:y+kernal.shape[0], x:x+kernal.shape[0]] = kernal
+    eImg = cv2.normalize(eImg, None, 0, 10, cv2.NORM_MINMAX)   
+    accumImage = cv2.add(eImg, accumImage)
 
     return accumImage
+
 
 def on_mouse_click (event, x, y, flags, frame):
     if event == cv2.EVENT_LBUTTONUP:
@@ -187,8 +198,10 @@ def main():
 
     # x, y center points and radius for the 'T' position   T_CIRCLE = [x, y, radius]
     T_CIRCLE = [np.size(court, 1)*.5, np.size(court, 0)*0.56, np.size(court,1)*0.234] 
-    cv2.circle(court, (int(T_CIRCLE[0]), int(T_CIRCLE[1])), int(T_CIRCLE[2]), cv2.COLOR_BGR2HSV, thickness=1, lineType=8, shift=0) #remove after testing
+    cv2.circle(court, (int(T_CIRCLE[0]), int(T_CIRCLE[1])), int(T_CIRCLE[2]), cv2.COLOR_BGR2HSV, thickness=2, lineType=8, shift=0) #remove after testing
     cv2.imshow("court", court) # remove after testing
+
+    kernal= createKernal(101)
     
     while True:
         success, frame = cap.read()
@@ -211,17 +224,18 @@ def main():
                 findControlPoints(p, T_CIRCLE)
 
                 # Commented out just for checking inside T functionality 
-##                accumImage = genHeatmap(p, accumImage)
-##                heatmap = cv2.applyColorMap(accumImage, cv2.COLORMAP_JET)
-##                heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
-
+                accumImage = genHeatmap(p, accumImage, kernal)
+                #accumImage = cv2.normalize(accumImage, None, 0, 1, cv2.NORM_MINMAX)
+                heatmap = cv2.applyColorMap(accumImage, cv2.COLORMAP_JET)
+                heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
+               
                 # HeatMap
                 # Display to User
                 cv2.imshow("Frame", Pframe)
-                #cv2.imshow("Warp",  heatmap)
-
+                cv2.imshow("Warp",  heatmap)
+               
                 # just to visually check findControlPoints is working
-                cv2.imshow("Court", court)
+                #cv2.imshow("Court", court)
 
             
         else:
@@ -235,12 +249,14 @@ def main():
         if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     # calculate and print percentage time in center T position
+
+    
     for p in Players:
         numPoints = len(p.controlPoints)
         numInT = p.controlPoints.count(1)
-        print(p.controlPoints)
-        print("time in T", str((numInT / numPoints)*100))
+        per_time = round((numInT / numPoints)*100, 2)
+        print("Percentage of Time in T", str(per_time) + " %")
 
 if __name__ == "__main__":
     main()
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()

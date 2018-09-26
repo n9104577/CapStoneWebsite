@@ -17,7 +17,8 @@ class Player():
         self.points = []
         self.radius = None
         self.controlPoints = []
-        self.distanceTravelled = 0
+        self.distanceTraveled = 0
+
     # Thresholds the image using the colours picked by the user
     def thresholdImage(self, image, tolerance):
         # Pick Colours
@@ -57,7 +58,7 @@ class Player():
         self.wCentersList.append((xworld, yworld + height))
 
     # get distance as you go
-    def getDistanceTravelledAYG(self):
+    def getdistanceTraveledAYG(self):
         pixPerM = court.shape[0] / 9.75
         
         numCenterPoints = len(self.wCentersList)
@@ -66,7 +67,7 @@ class Player():
             y1 = self.wCentersList[numCenterPoints-2][1]
             x2 = self.wCentersList[numCenterPoints-1][0]
             y2 = self.wCentersList[numCenterPoints-1][1]        
-            self.distanceTravelled = self.distanceTravelled + (abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))/ pixPerM)
+            self.distanceTraveled = self.distanceTraveled + (abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))/ pixPerM)
             cv2.line(selfDistCourt, (x1,y1),(x2,y2), (0,0,255), thickness=3, lineType=8, shift=0)
             cv2.imshow("selfDistCourt", selfDistCourt)
         
@@ -75,23 +76,23 @@ class Player():
 
 
 # calculate at the end
-def getDistanceTravelled(p):
+def getdistanceTraveled(p):
         pixPerM = court.shape[0] / 9.75
         distCourt = court
         
-        distanceTravelled = 0
+        distanceTraveled = 0
         for i in range(0, len(p.wCentersList)-1):
            
             x1 = p.wCentersList[i][0]
             y1 = p.wCentersList[i][1]
             x2 = p.wCentersList[i+1][0]
             y2 = p.wCentersList[i+1][1]
-            distanceTravelled = distanceTravelled + abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))
+            distanceTraveled = distanceTraveled + abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))
             cv2.line(distCourt, (x1,y1),(x2,y2), (0,0,255), thickness=1, lineType=8, shift=0)
             cv2.imshow("distCourt", distCourt)
-        distanceTravelled = distanceTravelled/ pixPerM
+        distanceTraveled = distanceTraveled/ pixPerM
     
-        return distanceTravelled
+        return distanceTraveled
 
 
 # find points inside the center T circle
@@ -106,9 +107,6 @@ def findControlPoints(p, T_CIRCLE):
         p.controlPoints.append(0)
        # cv2.circle(court, (int(x), int(y)), int(5), (255,0,0), thickness=1, lineType=8, shift=0) # remove after testing
 
-
-
-
 def createKernal(radius):    
     kernal = np.zeros((radius,radius))
     mid = int((radius-1)/ 2)    
@@ -120,12 +118,10 @@ def createKernal(radius):
                     kernal[radius-1-x][y] = r
     return kernal
 
-    
-
 # Picks a selection of colours and averages it
 def chooseColours(HSVframe):
     # jake for testing so i dont have to repeat
-    return [36, 229, 103]
+    #return [36, 229, 103]
     # Select Region
     r = cv2.selectROI("Pick Colour", HSVframe)
 
@@ -173,7 +169,7 @@ def computeHomography(frame, court):
     mask = frame
 
     #for my vid so i dont have to set them each time
-    courtPoints = [[182, 180], [446, 180], [596, 358], [27, 358]]
+    #courtPoints = [[182, 180], [446, 180], [596, 358], [27, 358]]
     while True:
         cv2.imshow('Pick Points', mask)
         cv2.setMouseCallback('Pick Points', on_mouse_click, mask)
@@ -196,9 +192,6 @@ def computeHomography(frame, court):
     
     return cv2.findHomography(src, dst)
 
-
-
-
 def genHeatmap(p, accumImage, kernal):
     x = p.wCenters[0]
     y = p.wCenters[1]
@@ -207,18 +200,12 @@ def genHeatmap(p, accumImage, kernal):
 
     # bottom and right edge
     if (x > accumImage.shape[1]- int(np.floor(kernal.shape[1]/2)) -1) or (y > accumImage.shape[0]-int(np.floor(kernal.shape[0]/2)) - 1):
-        #print("accumIMage.shape[0]: " + str(accumImage.shape[0]) + "   y: " + str(y))
-        #print("accumIMage.shape[1]: " + str(accumImage.shape[1]) + "   x: " + str(x))
-        #print("y difference: " + str(accumImage.shape[0]- y) + "  x difference: " + str(accumImage.shape[1]-x))
-        #input("Press Enter to continue...")
         kernal = kernal[0: accumImage.shape[0]- y, 0: accumImage.shape[1]-x]
-        #print("kernal shape: " + str(kernal.shape))
         kernal = np.dot(kernal, 5)
         eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
         eImg[y- int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2))+ np.remainder(kernal.shape[0], 2), x-int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+ np.remainder(kernal.shape[1], 2)] = kernal
         eImg = cv2.normalize(eImg, None, 0, 10, cv2.NORM_MINMAX)   
         accumImage = cv2.add(eImg, accumImage)
-        #print("passed")
         return accumImage
     
     kernal = np.dot(kernal, 5)
@@ -258,8 +245,6 @@ def main():
     accumImage = np.zeros((court.shape[0], court.shape[1]), np.uint8)
     h, status = computeHomography(frame, court)
 
-
-
     # x, y center points and radius for the 'T' position   T_CIRCLE = [x, y, radius]
     T_CIRCLE = [np.size(court, 1)*.5, np.size(court, 0)*0.56, np.size(court,1)*0.234] 
     cv2.circle(court, (int(T_CIRCLE[0]), int(T_CIRCLE[1])), int(T_CIRCLE[2]), cv2.COLOR_BGR2HSV, thickness=2, lineType=8, shift=0) #remove after testing
@@ -294,7 +279,7 @@ def main():
                 heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
 
                 # Get distance Travelled
-                p.getDistanceTravelledAYG()
+                p.getdistanceTraveledAYG()
                 
                 # HeatMap
                 # Display to User
@@ -324,7 +309,7 @@ def main():
         numInT = p.controlPoints.count(1)
         per_time = round((numInT / numPoints)*100, 2)
         print("Percentage of Time in T: ", str(per_time) + " %")
-        print("selfdistanceTravelled: ", str(p.distanceTravelled) + " Meters")
+        print("selfdistanceTraveled: ", str(p.distanceTraveled) + " Meters")
 if __name__ == "__main__":
     main()
     #cv2.destroyAllWindows()

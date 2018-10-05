@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 # Create your views here.
+import cv2
+import numpy as np
 
 #import forms
 from squashApp.forms import RegistrationForm, LoginForm, searchVideoForm,searchPlayerForm
@@ -58,7 +60,7 @@ from .forms import VideoForm
 
 
 # import tracking script	
-from squashApp.HSVTracking import main
+from squashApp.SquashTracking import main
 
 
 # User RegistrationForm
@@ -156,6 +158,7 @@ def video(request):
 		videofile= videoObject.videofile
 		videoName = videoObject.name
 		HttpResponseRedirect('squashApp/login.html')
+		
 		main(videofile.url[1:], videoName, videoObject)
 		
 		return HttpResponseRedirect('/videoSelection')

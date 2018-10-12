@@ -214,10 +214,10 @@ def videoSelection(request):
 @login_required		
 def videoData(request, videoId):
 	video = models.videoData.objects.get(videoId_id=videoId)
-	videofile = video.processedVideoFile
-	
-	context= {'videofile': videofile}
-	
+	parentvideo = models.Video.objects.get(videoId=videoId)
+	player1 = models.playerData.objects.get(playerId=parentvideo.player1.playerId)
+	player2 = models.playerData.objects.get(playerId=parentvideo.player2.playerId)
+	context = {'video': video, 'player1': player1, 'player2': player2}
 	return render(request, 'squashApp/videoData.html', context)
 
 @login_required		

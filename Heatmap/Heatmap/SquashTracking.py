@@ -116,7 +116,7 @@ def createKernal(radius):
 # Picks a selection of colours and averages it
 def chooseColours(HSVframe):
     # jake for testing so i dont have to repeat
-    #return [36, 229, 103]
+    return [36, 229, 103]
     # Select Region
     r = cv2.selectROI("Pick Colour", HSVframe)
         

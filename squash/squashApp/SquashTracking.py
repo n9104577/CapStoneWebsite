@@ -9,70 +9,75 @@ courtPoints = []
 #court = cv2.imread('court.jpg') # put back into main after testing findControlPoints
 selfDistCourt = cv2.imread('court.jpg')
 class Player():
-    def __init__(self, colours=None):
-        self.colours = colours
-        self.contoursPoly = None
-        self.centers = None
-        self.wCenters = None
-        self.wCentersList = []
-        self.points = []
-        self.radius = None
-        self.controlPoints = []
-        self.distanceTraveled = 0
+	def __init__(self, colours=None):
+		self.heatmap = None
+		self.stringLine = None
+		self.colours = colours
+		self.contoursPoly = None
+		self.centers = None
+		self.wCenters = None
+		self.wCentersList = []
+		self.points = []
+		self.radius = None
+		self.controlPoints = []
+		self.distanceTraveled = 0
 
-    # Thresholds the image using the colours picked by the user
-    def thresholdImage(self, image, tolerance):
-        # Pick Colours
-        H = self.colours[0]
-        S = self.colours[1]
-        V = self.colours[2]
-        t = tolerance
-            
-        # Error Margin = +-m
-        m = 35
+	# Thresholds the image using the colours picked by the user
+	def thresholdImage(self, image, tolerance):
+		# Pick Colours
+		H = self.colours[0]
+		S = self.colours[1]
+		V = self.colours[2]
+		t = tolerance
 
-        # Thresholding HSV image
-        Pframe = cv2.inRange(image, (H-t, S-t, V-t), (H+t, S+t, V+t))
-        return Pframe
+		# Error Margin = +-m
+		m = 35
 
-    # Finds the largest blob available and tracks it
-    def findContours(self, frame):
-        _, contours, hierarchy = cv2.findContours(frame, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-        area = []
-        for contour in contours:
-            area.append(cv2.contourArea(contour))
-        if area: i = area.index(max(area))
+		# Thresholding HSV image
+		Pframe = cv2.inRange(image, (H-t, S-t, V-t), (H+t, S+t, V+t))
+		return Pframe
 
-        if area:
-            self.contoursPoly = cv2.approxPolyDP(contours[i], 3, True)
-            self.centers, self.radius = cv2.minEnclosingCircle(self.contoursPoly)
+	# Finds the largest blob available and tracks it
+	def findContours(self, frame):
+		_, contours, hierarchy = cv2.findContours(frame, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+		area = []
+		for contour in contours:
+			area.append(cv2.contourArea(contour))
+		if area: i = area.index(max(area))
 
-    def warpPoint(self, h):
-        imagepoint = [self.centers[0], self.centers[1], 1]
-        worldpoint = np.array(np.dot(h, imagepoint))
-        scalar = worldpoint[2]
-        xworld = int((worldpoint[0]/scalar))
-        yworld = int((worldpoint[1]/scalar))
+		if area:
+			self.contoursPoly = cv2.approxPolyDP(contours[i], 3, True)
+			self.centers, self.radius = cv2.minEnclosingCircle(self.contoursPoly)
 
-        height = 200
-        self.wCenters = (xworld, yworld + height)
-        self.wCentersList.append((xworld, yworld + height))
+	def warpPoint(self, h):
+		imagepoint = [self.centers[0], self.centers[1], 1]
+		worldpoint = np.array(np.dot(h, imagepoint))
+		scalar = worldpoint[2]
+		xworld = int((worldpoint[0]/scalar))
+		yworld = int((worldpoint[1]/scalar))
 
-    # get distance as you go
-    def getdistanceTraveledAYG(self, court):
-        pixPerM = court.shape[0] / 9.75
-        
-        numCenterPoints = len(self.wCentersList)
-        if numCenterPoints > 1:            
-            x1 = self.wCentersList[numCenterPoints-2][0]
-            y1 = self.wCentersList[numCenterPoints-2][1]
-            x2 = self.wCentersList[numCenterPoints-1][0]
-            y2 = self.wCentersList[numCenterPoints-1][1]        
-            self.distanceTraveled = self.distanceTraveled + (abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))/ pixPerM)
-            cv2.line(selfDistCourt, (x1,y1),(x2,y2), (0,0,255), thickness=3, lineType=8, shift=0)
-            cv2.imshow("selfDistCourt", selfDistCourt)
-        
-    
+		height = 200
+		self.wCenters = (xworld, yworld + height)
+		self.wCentersList.append((xworld, yworld + height))
+
+	# get distance as you go
+	def getdistanceTraveledAYG(self, court):
+		#pixPerM = court.shape[0] / 9.75
+		pixPerM = court.shape[1] / 6.4
+		
+		numCenterPoints = len(self.wCentersList)
+		if numCenterPoints > 1:            
+			x1 = self.wCentersList[numCenterPoints-2][0]
+			y1 = self.wCentersList[numCenterPoints-2][1]
+			x2 = self.wCentersList[numCenterPoints-1][0]
+			y2 = self.wCentersList[numCenterPoints-1][1]        
+			self.distanceTraveled = self.distanceTraveled + (abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))/ pixPerM)
+			cv2.line(selfDistCourt, (x1,y1),(x2,y2), (0,0,255), thickness=3, lineType=8, shift=0)
+
+			cv2.imshow("selfDistCourt", selfDistCourt)
+			self.stringLine = selfDistCourt
+
+
 
 
 
@@ -235,14 +240,25 @@ def main(videoFile, videoName, videoObject):
 	cap.set(cv2.CAP_PROP_FPS, 60)
 	success, frame = cap.read()
 
-	# Get current width of frame
+	
+	# setup output video
 	width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-	# Get current height of frame
 	height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
-	videoName = videoName + "Processed"
-	filePath = 'media/processedVideos/' + videoName + '.mp4'
+	processedVideoName = videoName + "Processed"
+	processedVideoFilePath = 'media/processedVideos/' + videoName + '.mp4'	
+	processedVideo = cv2.VideoWriter(processedVideoFilePath,-1, 20.0, (int(width),int(height)))
 
-	out = cv2.VideoWriter(filePath,-1, 20.0, (int(width),int(height)))
+	player1HeatMapName = videoName + "player1Heatmap"
+	player1HeatMapPath = 'media/processedImages/' + player1HeatMapName + '.png'	
+	player1StringLineName = videoName + "player1StringLine"
+	player1StringLinePath = 'media/processedImages/' + player1StringLineName + '.png'
+	player2HeatMapName = videoName + "player2Heatmap"
+	player2HeatMapPath = 'media/processedImages/' + player2HeatMapName + '.png'	
+	player2StringLineName = videoName + "player2StringLine"
+	player2StringLinePath = 'media/processedImages/' + player2StringLineName + '.png'
+	
+	
+	
 	##Track 1 or 2 Players
 	#raw = input("Enter Number of Players To Track: \n")
 	#try:
@@ -263,6 +279,7 @@ def main(videoFile, videoName, videoObject):
 	kernal= createKernal(101)
 
 	
+
 	
 	while True:
 		success, frame = cap.read()
@@ -292,7 +309,10 @@ def main(videoFile, videoName, videoObject):
 
 				# Get distance Travelled
 				p.getdistanceTraveledAYG(court)
-				out.write(Pframe)
+				
+				p.heatmap = heatmap
+				
+		
 				# HeatMap
 				# Display to User
 				cv2.imshow("Frame", Pframe)
@@ -303,6 +323,8 @@ def main(videoFile, videoName, videoObject):
 
 				print("processing")
 
+			# save output video
+			processedVideo.write(Pframe)
 		else:
 			colours = chooseColours(HSVframe)
 			if colours:
@@ -313,23 +335,53 @@ def main(videoFile, videoName, videoObject):
         
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
-    
+   
 
-	out.release()
-	filePath = filePath[5:]
-	data = {'videoId': videoObject, 'name' : videoName, 'processedVideoFile' : filePath}
-	videoData.objects.create(**data)
+		print("done")
 	
 	
-	print("done")
+	
+	
 	# calculate and print percentage time in center T position
+	pNum = 1
 	for p in Players:
 		numPoints = len(p.controlPoints)
 		numInT = p.controlPoints.count(1)
 		per_time = round((numInT / numPoints)*100, 2)
+		
 		print("Percentage of Time in T: ", str(per_time) + " %")
 		print("selfdistanceTraveled: ", str(p.distanceTraveled) + " Meters")
+		if pNum == 1:
+			player1DistanceTravelled = p.distanceTraveled
+			player1TimeInT = per_time
+			cv2.imwrite(player1HeatMapPath, p.heatmap );
+			cv2.imwrite(player1StringLinePath, p.stringLine );
+		if pNum == 2:
+			player2DistanceTravelled = p.distanceTraveled
+			player2TimeInT = per_time
+			cv2.imwrite(player2HeatMapPath, p.heatmap );
+			cv2.imwrite(player2StringLinePath, p.stringLine );
+		else :
+			player2DistanceTravelled = None 
+			player2TimeInT = None			
+		pNum = pNum + 1
 		
+	processedVideo.release()
+	processedVideoFilePath = processedVideoFilePath[5:]
+	player1HeatMapPath = player1HeatMapPath[5:]
+	player1StringLinePath = player1StringLinePath[5:]
+	player2HeatMapPath = player2HeatMapPath[5:]
+	player2StringLinePath = player2StringLinePath[5:]
+	
+	
+	data = {'videoId': videoObject, 'name' : videoName, 'processedVideoFile' : processedVideoFilePath, 
+	'player1HeatMapImage' : player1HeatMapPath, 'player1StringLineImage' : player1StringLinePath,	'player1DistanceTravelled': player1DistanceTravelled, 'player1TimeInT' : player1TimeInT,
+	'player2HeatMapImage' : player2HeatMapPath, 'player2StringLineImage' : player2StringLinePath,	'player2DistanceTravelled': player2DistanceTravelled, 'player2TimeInT' : player2TimeInT,}
+	
+	videoData.objects.create(**data)
+	
+	
+
 		
 if __name__ == "__main__":
     main()

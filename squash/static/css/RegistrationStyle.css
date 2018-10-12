@@ -32,6 +32,7 @@ h3  {
 	text-align: center;
 	font-family:"BrandonGrotW01Light";
 	font-size: 30px;
+	color: black;
 }
 
 .h3PleaseSelect  {
@@ -46,6 +47,21 @@ h4  {
 
 .loginLink  {
 	color:#1ab188;
+}
+.column{
+	float: left;
+	width: 50%;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+.container {
+    position: relative;
+    text-align: center;
+    color: white;
 }
 
 hr  {

@@ -61,8 +61,18 @@ class Video(models.Model):
 class videoData(models.Model):
 	videoDataId = models.AutoField(primary_key=True)
 	videoId = models.ForeignKey('Video', on_delete=models.CASCADE)
-	name = models.CharField(_('name'), max_length = 500)
-	processedVideoFile = models.FileField(upload_to='processedVideos/', null=True, verbose_name="")
+	name = models.CharField(_('name'), max_length = 500)	
+	processedVideoFile = models.FileField(upload_to='processedVideos/', null=True, verbose_name="")	
+
+	player1HeatMapImage = models.FileField(upload_to='processedImages/', null=True, verbose_name="")
+	player1StringLineImage = models.FileField(upload_to='processedImages/', null=True, verbose_name="")
+	player1DistanceTravelled = models.FloatField(null=True, blank=True, default=0.0)
+	player1TimeInT = models.FloatField(null=True, blank=True, default=0.0)
+	player2HeatMapImage = models.FileField(upload_to='processedImages/', null=True, verbose_name="")
+	player2StringLineImage = models.FileField(upload_to='processedImages/', null=True, verbose_name="")
+	player2DistanceTravelled = models.FloatField(null=True, blank=True, default=0.0)
+	player2TimeInT = models.FloatField(null=True, blank=True, default=0.0)
+	
 	
 class playerData(models.Model):
 	playerId = models.AutoField(primary_key=True)

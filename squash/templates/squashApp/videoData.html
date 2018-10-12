@@ -16,12 +16,45 @@
 				<br><br>
 				<div class="field-wrap">
 					<video width='560' controls>
-						<source src='{{ MEDIA_URL }}{{ videofile }}' type='video/mp4'>
+						<source src='{{ MEDIA_URL }}{{ video.processedVideoFile }}' type='video/mp4'>
 						Your browser does not support the video tag.
 					</video>
 				</div>
+			</div>
+			<br><br>
+			<div class="row">
+				<div class="column">
+					<h1>{{player1.get_name}}</h1>
+					<br>
+					<div class = "container">		
+						<div class="column">						
+							<h3>Time in T : {{video.player1TimeInT}} percent</h3>						
+							<img src='{{ MEDIA_URL }}{{ video.player1HeatMapImage }}'>		
+						</div>
+						<div class="column">	
+							<h3>Distanced Travelled : {{video.player1DistanceTravelled}} Meters</h3>						
+							<img src='{{ MEDIA_URL }}{{ video.player1StringLineImage }}'>
+						</div>
+					</div>	
+					
+				</div>
+				<div class="column">
+					<h1>{{player2.get_name}}</h1>
+					<br>
+					<div class = "container">		
+						<div class="column">					
+							<h3>Time in T : {{video.player2TimeInT}} percent</h3>						
+							<img src='{{ MEDIA_URL }}{{ video.player2HeatMapImage }}'>		
+						</div>
+						<div class="column">						
+							<h3>Distanced Travelled : {{video.player2DistanceTravelled}} Meters</h3>				
+							<img src='{{ MEDIA_URL }}{{ video.player2StringLineImage }}'>
+						</div>
+					</div>	
+				</div>
 				<br><br>				
 			</div>
+			<br><br>
 		</body>
 	{% endblock%}
 </html>

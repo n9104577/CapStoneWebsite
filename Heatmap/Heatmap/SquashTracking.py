@@ -67,7 +67,7 @@ class Player():
             y2 = self.wCentersList[numCenterPoints-1][1]        
             self.distanceTraveled = self.distanceTraveled + (abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))/ pixPerM)
             cv2.line(court, (x1,y1),(x2,y2), (0,0,255), thickness=3, lineType=8, shift=0)
-            cv2.imshow("selfDistCourt", court)
+            #cv2.imshow("selfDistCourt", court)
         
 
 # Calculate At The End
@@ -239,7 +239,7 @@ def on_mouse_click (event, x, y, flags, frame):
 def main():
     Players = []
     # loop over the image paths
-    cap = cv2.VideoCapture("squash.mp4")
+    cap = cv2.VideoCapture("squash3.mp4")
     court = cv2.imread('court.jpg')
     distTrav = copy.copy(court)
 

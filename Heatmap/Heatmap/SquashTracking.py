@@ -116,7 +116,7 @@ def createKernal(radius):
 # Picks a selection of colours and averages it
 def chooseColours(HSVframe):
     # jake for testing so i dont have to repeat
-    return [36, 229, 103]
+    #return [36, 229, 103]
     # Select Region
     r = cv2.selectROI("Pick Colour", HSVframe)
         
@@ -319,7 +319,7 @@ def main():
         print("Percentage of Time in T: ", str(per_time) + " %")
 
         #Bugged Numpy float not callable
-        #print("selfdistanceTraveled: ", str(p.distanceTraveled(court)) + " Meters"
+        print("selfdistanceTraveled: " + str(p.distanceTraveled) + " Meters")
 if __name__ == "__main__":
     main()
     cv2.waitKey()

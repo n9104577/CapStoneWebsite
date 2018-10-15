@@ -158,10 +158,11 @@ def video(request):
 		videofile= videoObject.videofile
 		videoName = videoObject.name
 		HttpResponseRedirect('squashApp/login.html')
-		
-		main(videofile.url[1:], videoName, videoObject)
-		
-		return HttpResponseRedirect('/videoSelection')
+		noPlayers = videoObject.noPlayers
+		main(videofile.url[1:], videoName, videoObject, noPlayers)
+		videoId = videoObject.videoId
+		redirect = "/videoData/" + str(videoId)
+		return HttpResponseRedirect(redirect)
 	if(Video.objects.last() == None):
 		context= {'form': form}
 	else:

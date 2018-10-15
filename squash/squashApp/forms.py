@@ -43,11 +43,12 @@ class VideoForm(forms.ModelForm):
 	name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={'placeholder': 'name*'}))
 	player1 = forms.ModelChoiceField(queryset=playerData.objects.all(), empty_label="Player 1")
 	player2 = forms.ModelChoiceField(queryset=playerData.objects.all(), empty_label="Player 2")
+	noPlayers = forms.ChoiceField(choices=[(x, x) for x in range(1,3)])
 	player1.label_from_instance = lambda obj: "{0} {1}".format(obj.first_name, obj.last_name)
 	player2.label_from_instance = lambda obj: "{0} {1}".format(obj.first_name, obj.last_name)
 	class Meta:
 		model= Video
-		fields= ["name", "player1", "player2", "videofile"]
+		fields= ["name", "player1", "player2", "noPlayers", "videofile"]
 
 		
 		

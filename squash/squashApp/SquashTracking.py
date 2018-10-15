@@ -6,13 +6,11 @@ from squashApp.models import Video, videoData
 # Global
 courtPoints = []
 
-#court = cv2.imread('court.jpg') # put back into main after testing findControlPoints
-selfDistCourt = cv2.imread('court.jpg')
 class Player():
 	def __init__(self, colours=None):
+		self.colours = colours
 		self.heatmap = None
 		self.stringLine = None
-		self.colours = colours
 		self.contoursPoly = None
 		self.centers = None
 		self.wCenters = None
@@ -21,7 +19,8 @@ class Player():
 		self.radius = None
 		self.controlPoints = []
 		self.distanceTraveled = 0
-
+		self.accumImage = None
+		self.distTrav = None
 	# Thresholds the image using the colours picked by the user
 	def thresholdImage(self, image, tolerance):
 		# Pick Colours
@@ -29,9 +28,6 @@ class Player():
 		S = self.colours[1]
 		V = self.colours[2]
 		t = tolerance
-
-		# Error Margin = +-m
-		m = 35
 
 		# Thresholding HSV image
 		Pframe = cv2.inRange(image, (H-t, S-t, V-t), (H+t, S+t, V+t))
@@ -57,52 +53,48 @@ class Player():
 		yworld = int((worldpoint[1]/scalar))
 
 		height = 200
-		self.wCenters = (xworld, yworld + height)
-		self.wCentersList.append((xworld, yworld + height))
+		x = xworld
+		y = yworld + height
+		self.wCenters = ((x, y))
+		self.wCentersList.append((x, y))
 
 	# get distance as you go
 	def getdistanceTraveledAYG(self, court):
-		#pixPerM = court.shape[0] / 9.75
-		pixPerM = court.shape[1] / 6.4
-		
+		pixPerM = court.shape[0] / 9.75
+
 		numCenterPoints = len(self.wCentersList)
 		if numCenterPoints > 1:            
 			x1 = self.wCentersList[numCenterPoints-2][0]
 			y1 = self.wCentersList[numCenterPoints-2][1]
 			x2 = self.wCentersList[numCenterPoints-1][0]
 			y2 = self.wCentersList[numCenterPoints-1][1]        
-			self.distanceTraveled = self.distanceTraveled + (abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))/ pixPerM)
-			cv2.line(selfDistCourt, (x1,y1),(x2,y2), (0,0,255), thickness=3, lineType=8, shift=0)
-
-			cv2.imshow("selfDistCourt", selfDistCourt)
-			self.stringLine = selfDistCourt
-
-
-
-
-
-# calculate at the end
-def getdistanceTraveled(p, court):
-        pixPerM = court.shape[0] / 9.75
-        distCourt = court
+			self.distanceTraveled = round(self.distanceTraveled + (abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))/ pixPerM), 2)
+			cv2.line(court, (x1,y1),(x2,y2), (0,0,255), thickness=2, lineType=8, shift=0)
+			#cv2.imshow("selfDistCourt", court)
+			self.stringLine = court
         
-        distanceTraveled = 0
-        for i in range(0, len(p.wCentersList)-1):
-           
-            x1 = p.wCentersList[i][0]
-            y1 = p.wCentersList[i][1]
-            x2 = p.wCentersList[i+1][0]
-            y2 = p.wCentersList[i+1][1]
-            distanceTraveled = distanceTraveled + abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))
-            cv2.line(distCourt, (x1,y1),(x2,y2), (0,0,255), thickness=1, lineType=8, shift=0)
-            cv2.imshow("distCourt", distCourt)
-        distanceTraveled = distanceTraveled/ pixPerM
+
+# # Calculate At The End
+# def getdistanceTraveled(p, court):
+        # pixPerM = court.shape[0] / 9.75
+        # distCourt = court
+        
+        # distanceTraveled = 0
+        # for i in range(0, len(p.wCentersList)-1):
+            # x1 = p.wCentersList[i][0]
+            # y1 = p.wCentersList[i][1]
+            # x2 = p.wCentersList[i+1][0]
+            # y2 = p.wCentersList[i+1][1]
+            # distanceTraveled += abs(np.sqrt((x2-x1)**2 + (y2-y1)**2))
+            # cv2.line(distCourt, (x1,y1),(x2,y2), (0,0,255), thickness=1, lineType=8, shift=0)
+            # cv2.imshow("distCourt", distCourt)
+        # distanceTraveled = distanceTraveled/ pixPerM
     
-        return distanceTraveled
+        # return distanceTraveled
 
 
 # find points inside the center T circle
-def findControlPoints(p, T_CIRCLE, court):
+def findControlPoints(p, T_CIRCLE):
     x = p.wCenters[0]
     y = p.wCenters[1]
     if (x - T_CIRCLE[0])**2 + (y - T_CIRCLE[1])**2 < T_CIRCLE[2]**2:
@@ -113,6 +105,7 @@ def findControlPoints(p, T_CIRCLE, court):
         p.controlPoints.append(0)
        # cv2.circle(court, (int(x), int(y)), int(5), (255,0,0), thickness=1, lineType=8, shift=0) # remove after testing
 
+# Creates Heatmap Kernal
 def createKernal(radius):    
     kernal = np.zeros((radius,radius))
     mid = int((radius-1)/ 2)    
@@ -126,12 +119,10 @@ def createKernal(radius):
 
 # Picks a selection of colours and averages it
 def chooseColours(HSVframe):
-    # jake for testing so i dont have to repeat
-    return [36, 229, 103]
+   
     # Select Region
     r = cv2.selectROI("Pick Colour", HSVframe)
-
-    
+        
     while sum(r) > 0:     
         # Crop Selection
         selection = HSVframe[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
@@ -141,7 +132,7 @@ def chooseColours(HSVframe):
 
         cv2.imshow('Pick Colour', HSVframe)
         
-        #Break Out
+        # Break Out
         if (len(colours) > 0):
             
             cv2.destroyWindow('Pick Colour')
@@ -174,8 +165,7 @@ def computeHomography(frame, court):
     # Find Court Points
     mask = frame
 
-    #for my vid so i dont have to set them each time
-    courtPoints = [[182, 180], [446, 180], [596, 358], [27, 358]]
+    
     while True:
         cv2.imshow('Pick Points', mask)
         cv2.setMouseCallback('Pick Points', on_mouse_click, mask)
@@ -199,48 +189,66 @@ def computeHomography(frame, court):
     return cv2.findHomography(src, dst)
 
 def genHeatmap(p, accumImage, kernal):
+    # Setup Variables
     x = p.wCenters[0]
     y = p.wCenters[1]
-    if (x <= 0) or (y <= 0): return accumImage
-    if accumImage.shape[0]-y < 0: return accumImage
+    eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
+    kernal = np.dot(kernal, 5)
 
-    # bottom and right edge
+    # Left and Top Check
+    if (x <= 0) or (y <= 0): return accumImage
+    if accumImage.shape[0] - y < 0: return accumImage
+
+    # Bottom and Right Check
     if (x > accumImage.shape[1]- int(np.floor(kernal.shape[1]/2)) -1) or (y > accumImage.shape[0]-int(np.floor(kernal.shape[0]/2)) - 1):
         kernal = kernal[0: accumImage.shape[0]- y, 0: accumImage.shape[1]-x]
-        kernal = np.dot(kernal, 5)
-        eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
-        eImg[y- int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2))+ np.remainder(kernal.shape[0], 2), x-int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+ np.remainder(kernal.shape[1], 2)] = kernal
-        eImg = cv2.normalize(eImg, None, 0, 10, cv2.NORM_MINMAX)   
-        accumImage = cv2.add(eImg, accumImage)
-        return accumImage
+        eImg[y - int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2)) + np.remainder(kernal.shape[0], 2), x - int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+ np.remainder(kernal.shape[1], 2)] = kernal
+    # Full Size
+    else:
+        eImg[y- int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2))+1, x-int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+1] = kernal
+   
     
-    kernal = np.dot(kernal, 5)
-    #print("kernal shape outside if : " + str(kernal.shape))
-    eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
-    eImg[y- int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2))+1, x-int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+1] = kernal
     eImg = cv2.normalize(eImg, None, 0, 10, cv2.NORM_MINMAX)   
-    accumImage = cv2.add(eImg, accumImage)
-
+    #accumImage = cv2.add(eImg, accumImage) # For Non-Normalised Image
+    accumImage = accumImage.astype(np.int)
+    accumImage = eImg + accumImage
     return accumImage
 
+# Track only Court Objects
+def setROI(frame):
+    # Find x,y,w,h
+    x = courtPoints[0][0]
+    y = courtPoints[0][1]
+    w = courtPoints[1][0] - courtPoints[0][0]
+    h = courtPoints[3][1] - courtPoints[0][1]
+
+    # Black out any thing outside of court
+    mask = np.zeros(frame.shape,np.uint8)
+    mask[y:y+h,x:x+w] = frame[y:y+h,x:x+w]
+
+    return mask
+ 
+def normalize(data):
+    data = data.astype(np.float64) / data.max()     # normalize the data to 0 - 1
+    data = 255 * data                               # Now scale by 255
+    img = data.astype(np.uint8)                     # Convert from float to uint8
+    return img
 
 def on_mouse_click (event, x, y, flags, frame):
     if event == cv2.EVENT_LBUTTONUP:
         courtPoints.append([x,y])
 
-def main(videoFile, videoName, videoObject):
+def main(videoFile, videoName, videoObject, noPlayers):
 	Players = []
 	# loop over the image paths
 	cap = cv2.VideoCapture(videoFile)
-	court = cv2.imread('court.jpg') 
-	cv2.imshow('court', court)
-	selfDistCourt = cv2.imread('court.jpg')
+	court = cv2.imread('court.jpg')
+	
 
 	# cap = cv2.VideoCapture(0)
 	cap.set(cv2.CAP_PROP_FPS, 60)
 	success, frame = cap.read()
-
-	
+	#frame = cv2.resize(frame, None, fx = 0.5, fy = 0.5, interpolation = cv2.INTER_AREA)
 	# setup output video
 	width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 	height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
@@ -256,101 +264,108 @@ def main(videoFile, videoName, videoObject):
 	player2HeatMapPath = 'media/processedImages/' + player2HeatMapName + '.png'	
 	player2StringLineName = videoName + "player2StringLine"
 	player2StringLinePath = 'media/processedImages/' + player2StringLineName + '.png'
+
+	#noPlayers = 2 # Editable - Change via GUI
 	
-	
-	
-	##Track 1 or 2 Players
-	#raw = input("Enter Number of Players To Track: \n")
-	#try:
-	#    # Attempt to read user input
-	#    noPlayers = int(raw)
-	#except:
-	#    # Default 1
-	#    noPlayers = 1
-	noPlayers = 1
-	accumImage = np.zeros((court.shape[0], court.shape[1]), np.uint8)
 	h, status = computeHomography(frame, court)
 
 	# x, y center points and radius for the 'T' position   T_CIRCLE = [x, y, radius]
-	T_CIRCLE = [np.size(court, 1)*.5, np.size(court, 0)*0.56, np.size(court,1)*0.234] 
-	cv2.circle(court, (int(T_CIRCLE[0]), int(T_CIRCLE[1])), int(T_CIRCLE[2]), cv2.COLOR_BGR2HSV, thickness=2, lineType=8, shift=0) #remove after testing
-	#cv2.imshow("court", court) # remove after testing
+	T_CIRCLE = [np.size(court, 1)*.5, np.size(court, 0)*0.56, np.size(court,1)*0.234]
 
-	kernal= createKernal(101)
+	# Dev Circle
+	cv2.circle(court, (int(T_CIRCLE[0]), int(T_CIRCLE[1])), int(T_CIRCLE[2]), cv2.COLOR_BGR2HSV, thickness=2, lineType=8, shift=0)
 
+	# Create Kernal
+	kernal = createKernal(101)
+	setup = False
 	
-
+	trackVid = np.zeros((court.shape[0], court.shape[1]), np.uint8)
 	
 	while True:
 		success, frame = cap.read()
-		cFrame = copy.copy(frame)
 		if not success: break
-		HSVframe = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+		#Image Procssing
+		#frame = cv2.resize(frame, None, fx = 0.5, fy = 0.5, interpolation = cv2.INTER_AREA)
+		HSVframe = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+		cFrame1 = copy.copy(frame)
 		if len(Players) >= noPlayers:
+			pNum = 1
+			
+			if(setup != True):
+				for p in Players:
+					p.accumImage = np.zeros((court.shape[0], court.shape[1]), np.uint8)
+					p.distTrav = copy.copy(court)
+				setup = True
+			
+			
 			for p in Players:
+				cFrame = copy.copy(frame)
+		
+				
+
 				Pframe = p.thresholdImage(HSVframe, 35)
 				Pframe = morph(Pframe)
+				Pframe = setROI(Pframe)
 				p.findContours(Pframe)
-
 				# Dev Tracking
 				Pframe = drawContours(cFrame, p)
-
+				
+				Pframe1 = p.thresholdImage(HSVframe, 35)
+				Pframe1 = morph(Pframe1)
+				Pframe1 = setROI(Pframe1)
+				p.findContours(Pframe1)				
+				Pframe1 = drawContours(cFrame1, p)
+				
 				# Warp Frame
 				p.warpPoint(h)
-				#cv2.warpPerspective(frame, h, (court.shape[1], court.shape[0]))
-				findControlPoints(p, T_CIRCLE, court)
+				findControlPoints(p, T_CIRCLE)
 
-				# Commented out just for checking inside T functionality 
-				accumImage = genHeatmap(p, accumImage, kernal)
-				#accumImage = cv2.normalize(accumImage, None, 0, 1, cv2.NORM_MINMAX)
-				heatmap = cv2.applyColorMap(accumImage, cv2.COLORMAP_JET)
+				# Generate Heatmap and Invert
+				p.accumImage = genHeatmap(p, p.accumImage, kernal)
+				normal = normalize(copy.copy(p.accumImage))       # Data is copied to preserve int datatype
+				normal = cv2.bitwise_not(normal)  
+
+				# Add Heatmap to Court
+				heatmap = cv2.applyColorMap(normal, cv2.COLORMAP_HOT)
 				heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
 
-				# Get distance Travelled
-				p.getdistanceTraveledAYG(court)
-				
+				# Get Distance Travelled
+				p.getdistanceTraveledAYG(p.distTrav)
 				p.heatmap = heatmap
-				
-		
 				# HeatMap
 				# Display to User
-				cv2.imshow("Frame", Pframe)
-				cv2.imshow("Warp",  heatmap)
-
+				cv2.imshow("Frame", Pframe1)
+				
+				if len(Players) == 2:
+				
+					if pNum == 1:
+						cv2.imshow("P1",  p.heatmap)
+					if pNum == 2:
+						cv2.imshow("P2", p.heatmap)
+					pNum = pNum + 1
+				else:
+					cv2.imshow("warp", p.heatmap)
 				# just to visually check findControlPoints is working
 				#cv2.imshow("Court", court)
 
-				print("processing")
-
 			# save output video
-			processedVideo.write(Pframe)
+			processedVideo.write(Pframe1)
 		else:
 			colours = chooseColours(HSVframe)
 			if colours:
 				Players.append(Player(colours))
-
-
-
-        
+       
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
-   
-
-		print("done")
-	
-	
-	
-	
-	# calculate and print percentage time in center T position
+    # calculate and print percentage time in center T position
 	pNum = 1
 	for p in Players:
 		numPoints = len(p.controlPoints)
 		numInT = p.controlPoints.count(1)
 		per_time = round((numInT / numPoints)*100, 2)
 		
-		print("Percentage of Time in T: ", str(per_time) + " %")
-		print("selfdistanceTraveled: ", str(p.distanceTraveled) + " Meters")
+
 		if pNum == 1:
 			player1DistanceTravelled = p.distanceTraveled
 			player1TimeInT = per_time
@@ -379,10 +394,7 @@ def main(videoFile, videoName, videoObject):
 	'player2HeatMapImage' : player2HeatMapPath, 'player2StringLineImage' : player2StringLinePath,	'player2DistanceTravelled': player2DistanceTravelled, 'player2TimeInT' : player2TimeInT,}
 	
 	videoData.objects.create(**data)
-	
-	
-
-		
 if __name__ == "__main__":
     main()
+    cv2.waitKey()
     cv2.destroyAllWindows()

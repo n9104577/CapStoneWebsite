@@ -4,7 +4,7 @@
 
 	{% block head %}
 		<head>
-			<title>AUSSIE SQUASH MATE!</title>	
+			<title>AUSTRALIAN SQUASH ANALYSIS</title>	
 			<meta name="viewport" content="width=device-width, initial-scale=1">
 		</head>
 	{% endblock %}
@@ -13,15 +13,15 @@
 	{% block body %}
 		<body>
 			<main>
-				<h1>AUSSY SQUASH MATE!</h1>
+				<h1>AUSTRALIAN SQUASH ANALYSIS</h1>
 				<hr>
 				<div class="form">
 					<div id="login">
 						<h4>Login here</h4>
 						<form method="post">
-							{% if login_message  != NULL %}
-								<div class="alert alert-danger">
-									<strong>{{ login_message |escape }}</strong>
+							{% if login_error  != NULL %}
+								<div class="error">
+									<strong>{{ login_error |escape }}</strong>
 								</div>
 							{% endif %}
 
@@ -32,7 +32,7 @@
 							<div class="field-wrap">
 								{{form.password}}
 							</div>
-							<button type="submit" class="button button-block" value="login" name="Login"/>Log In</button>
+							<button type="submit" class="button button-block" value="loginForm" name="loginForm"/>Log In</button>
 						</form>
 					</div>
 				</div>

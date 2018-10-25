@@ -31,6 +31,28 @@
 				</div>
 				<br><br>				
 			</div>
+			<table> 
+				<tr>
+					<th>Video</th>
+					<th>Player 1</th>
+					<th>Player 2</th>
+					<th>Link</th>
+				</tr>	
+					
+					{% for video in videoList %}	
+							{% if user.usertype == "C"%}										
+								{% if player.playerId == video.player1.playerId or player.playerId == video.player2.playerId  %}
+									<tr>
+										<td class="t1"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.name }}</a></td>
+										<td class="t2"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player1.get_name }}</a></td>						
+										<td class="t3"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player2.get_name }}</a></td>									
+										<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">VIEW MATCH</a></td>
+									</tr>
+								{% endif %}
+							{% endif %}				
+					{% endfor %}
+				
+			</table>
 		</body>
 	{% endblock%}
 </html>

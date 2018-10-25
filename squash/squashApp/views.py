@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
-# Create your views here.
+
 import cv2
 import numpy as np
 
@@ -12,9 +12,7 @@ from squashApp.forms import RegistrationForm, LoginForm, searchVideoForm,searchP
 # Import Password
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.hashers import make_password
-#from django.contrib.auth.decorators import login_required
-
-# This file renders all the pages and does most the form proccessing
+from django.contrib.auth.decorators import login_required
 
 # Import relevant functions, models, forms, ect
 
@@ -27,9 +25,7 @@ from django.template.context_processors import csrf
 from django.template.loader import get_template
 from django.template import RequestContext
 from django.contrib import auth, messages
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.hashers import make_password
-from django.contrib.auth.decorators import login_required
+
 from django.utils.encoding import force_text
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes
@@ -67,77 +63,47 @@ from squashApp.SquashTracking import main
 def register(request):
 	form = RegistrationForm()
 	# process the Register Form"
-	if 'Register' in request.POST:
+	if 'registerForm' in request.POST:
 		form = RegistrationForm(request.POST)
-		print('register in post')
 
-		# make sure form is valid
+	
 		if form.is_valid():
-			print("form valid")
-			# clean the form
 			form.clean()
-
-			# check passwords match
-			if form.cleaned_data['password'] == form.cleaned_data['password_confirm']:
+			
+			# if passwords match
+			if form.cleaned_data['password'] == form.cleaned_data['confirm_password']:
 				register = form.save(commit=False)
-
-				# hash the password
 				register.password = make_password(form.cleaned_data['password'])
 				register.status=1
-
-				# register the user with hashed password
+				register.usertype = 'P'
 				register.save()
-
-				# return to the homepage so the user can login, set form1 to form so the users username is already entered.
-				# and they know it was successful
 				return HttpResponseRedirect('squashApp/login', {'form': form})
-				
-				
-			# else return a message saying the passwords dont match
-			elif form.data['password'] != form.data['password_confirm']:
-				message = '*Passwords do not match!'
+			# if they dont
+			else:
+				message = 'Password didnt match*'
 				context = {
 					'form': form,					
-					'register_password_message' : message,
+					'password_error' : message,
 				}
 				return render(request, 'squashApp/register.html', context)
-
-			# shouldnt reach here password either match or dont match
-			else:
-				form = RegistrationForm()
-				
 	return render(request, 'squashApp/register.html', {'form': form})
 
 # User Login
 def loginView(request):
-
-	# Preset each form for first time loading of the homepage
-
 	form = LoginForm()
 
-	# process the Login Form"
-	if 'Login' in request.POST:
-
-		# Get the username and password entered
+	if 'loginForm' in request.POST:
 		username = request.POST['username']
 		password = request.POST['password']
-
-		# Check them against the database
 		user = authenticate(username=username, password=password)
 
-		# if user and pass match, login and redirect to the display page
 		if user is not None:
 			login(request, user)
 			return HttpResponseRedirect('/video')
-			return render(request, 'squashApp/homepage.html')
-			return HttpResponseRedirect('squashApp/homepage.html')
-
-		# Else let the user know they entered the wrong details
 		else:
-			message = '*Incorrect Username or Password'
-			return render(request, 'squashApp/login.html', {'form': form, 'login_message' : message})
+			message = 'UserName or Password wrong*'
+			return render(request, 'squashApp/login.html', {'form': form, 'login_error' : message})
 
-	# render the homepage if no form pushed
 	return render(request, 'squashApp/login.html', {'form': form})
 
 @login_required	
@@ -151,6 +117,10 @@ def video(request):
 	
 	form= VideoForm(request.POST or None, request.FILES or None)
 	if form.is_valid():
+		form.clean()
+		editform = form.save(commit=False)
+		user= request.user.username
+		editform.uploadedBy = user
 		form.save()
 		
 		
@@ -172,7 +142,7 @@ def video(request):
 		context= {'videofile': videofile,'form': form}
 		
 		
-	return render(request, 'squashApp/homepage.html', context)
+	return render(request, 'squashApp/uploadVideo.html', context)
 	
 	
 
@@ -182,7 +152,7 @@ def videoSelection(request):
 	form = searchVideoForm()
 	showSearch = False
 	videoList = models.Video.objects.all()
-	
+	reversedList=list(reversed(videoList))
 	if 'search' in request.POST:
 		searchVideo = request.POST['searchVideo']
 		searchPlayer = request.POST['searchPlayer']
@@ -194,18 +164,20 @@ def videoSelection(request):
 		player2List = models.Video.objects.filter(name__icontains=searchVideo, player2=searchPlayer).all()
 		List = list(chain(player1List, player2List))
 		videoList = list(dict.fromkeys(List))
+		reversedList=list(reversed(videoList))
+		
 		showSearch = True
 	
 	if(len(videoList) < 1):
 		videoList = models.Video.objects.all()
+		reversedList=list(reversed(videoList))
+		
 		showSearch = False
-	
-	
-	#print("videoList" + str(videoList))
-	
+		
 	context = {
 		'username': request.user.username,
 		'videoList': videoList,
+		'reversedList':reversedList,
 		'form': form,
 		'showSearch': showSearch
 	}
@@ -218,7 +190,8 @@ def videoData(request, videoId):
 	parentvideo = models.Video.objects.get(videoId=videoId)
 	player1 = models.playerData.objects.get(playerId=parentvideo.player1.playerId)
 	player2 = models.playerData.objects.get(playerId=parentvideo.player2.playerId)
-	context = {'video': video, 'player1': player1, 'player2': player2}
+
+	context = {'video': video, 'player1': player1, 'player2': player2, 'parentvideo': parentvideo}
 	return render(request, 'squashApp/videoData.html', context)
 
 @login_required		
@@ -251,14 +224,10 @@ def playerSelection(request):
 @login_required		
 def playerData(request, playerId):
 	player = models.playerData.objects.get(playerId=playerId)
+	videoList = models.Video.objects.all()
+	context= {'player': player, 'videoList' : videoList}
 
-	context= {'player': player}
-	
 	return render(request, 'squashApp/playerData.html', context)
-	
-	
-	
-	
 	
 	
 @login_required

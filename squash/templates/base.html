@@ -6,17 +6,23 @@
 <meta charset="UTF-8">
 <html lang="en">
 	{% block head %}
-		<title>AUSSIE SQUASH MATE!</title>	
+		<title>AUSTRALIAN SQUASH ANALYSIS</title>	
 	{% endblock %}
 	
 	{% block navigation %}	
 		<br><br>	
-		<nav>	
+		<nav id="nav_main">	
 			<li class="link"><a href="{% url 'video' %}">Upload Video</a></li>
 			<li class="link"><a href="{% url 'videoSelection' %}">Video Selection</a></li>
-			<li class="link"><a href="{% url 'playerSelection' %}">Player Selection</a></li>
-
-			<li class="link"><a href="{% url 'auth_logout' %}">Log Out</a></li>
+			{% if user.usertype == "C"%}
+				<li class="link"><a href="{% url 'playerSelection' %}">Player Selection</a></li>
+			{% endif %}
+			{% if user.is_staff %}
+				<li class="link"><a href="/admin">Admin Site</a></li>
+			{% endif %}
+		</nav>
+		<nav id="nav_logout">
+			<li class="link" id="logout_link"><a href="{% url 'auth_logout' %}">Log Out</a></li>
 		</nav>
 		<br><br>	
 	{% endblock %}

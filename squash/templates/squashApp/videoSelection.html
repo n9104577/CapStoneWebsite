@@ -10,7 +10,7 @@
 
 	{% block body %}
 		<body>
-			<h3> G'day {{user.get_username}}</h3>
+			<h3> G'day {{user.get_username}} ({{user.usertype}})</h3>
 			
 			<form class="form" method="POST">
 				{% csrf_token %}
@@ -18,17 +18,22 @@
 					<div class="field-wrap">
 						{{ form.searchVideo }}
 					</div>
-
+				</div>	
+				<div class="split-row">
 					<div class="field-wrap">
-						{{ form.searchPlayer }}
+						<div class="searchPlayer">
+							{{ form.searchPlayer }}
+						</div>
 					</div>
 				</div>	
+				<br><br>
 				<button type="submit" class="button button-block" value="search" name="search"/>search</button>				
 									
 			</form>
 			
 			{% if showSearch != True %}
 				<h3> Recent Uploads </h3>
+				<br>
 				<table> 
 					<tr>
 						<th>Video</th>
@@ -36,14 +41,27 @@
 						<th>Player 2</th>
 						<th>Link</th>
 					</tr>
-					{% for video in videoList|slice:":10" %}					
-						<tr>
-							<td class="t1">{{ video.name }}</td>
-							<td class="t2">{{ video.player1.get_name }}</td>						
-							<td class="t3">{{ video.player2.get_name }}</td>									
-							<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">Show Data</a></td>
-						</tr>
+					{% for video in reversedList|slice:":10" %}		
+						{% if user.usertype == "C"%}
+							<tr>
+								<td class="t1"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.name }}</a></td>
+								<td class="t2"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player1.get_name }}</a></td>						
+								<td class="t3"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player2.get_name }}</a></td>									
+								<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">VIEW MATCH</a></td>
+							</tr>
+						{% endif %}
 						
+						{% if user.usertype == "P" %}
+						
+							{% if user.get_username == video.uploadedBy %}
+								<tr>
+									<td class="t1"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.name }}</a></td>
+									<td class="t2"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player1.get_name }}</a></td>						
+									<td class="t3"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player2.get_name }}</a></td>									
+									<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">VIEW MATCH</a></td>
+								</tr>
+							{% endif %}
+						{% endif %}
 					{% endfor %}
 				</table>
 			{% endif %}
@@ -57,13 +75,25 @@
 						<th>Player 2</th>
 						<th>Link</th>
 					</tr>
-					{% for video in videoList %}					
-						<tr>
-							<td class="t1">{{ video.name }}</td>
-							<td class="t2">{{ video.player1.get_name }}</td>	
-							<td class="t3">{{ video.player2.get_name }}</td>							
-							<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">Show Data</a></td>
-						</tr>
+					{% for video in videoList %}	
+						{% if user.usertype == "C"%}
+							<tr}> </a>
+								<td class="t1"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.name }}</a></td>
+								<td class="t2"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player1.get_name }}</a></td>	
+								<td class="t3"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player2.get_name }}</a></td>							
+								<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">VIEW MATCH</a></td>
+							</tr>
+						{% endif %}
+						{% if user.usertype == "P" %}						
+							{% if user.get_username == video.uploadedBy %}
+								<tr>
+									<td class="t1"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.name }}</a></td>
+									<td class="t2"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player1.get_name }}</a></td>						
+									<td class="t3"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">{{ video.player2.get_name }}</a></td>									
+									<td class="t4"><a class="show" href="{% url 'videoData' videoId=video.videoId %}">VIEW MATCH</a></td>
+								</tr>
+							{% endif %}
+						{% endif %}
 						
 					{% endfor %}
 				</table>

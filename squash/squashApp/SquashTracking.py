@@ -3,6 +3,7 @@ import copy
 import cv2
 import time
 from squashApp.models import Video, videoData
+import keyboard
 # Global
 courtPoints = []
 
@@ -189,30 +190,36 @@ def computeHomography(frame, court):
     return cv2.findHomography(src, dst)
 
 def genHeatmap(p, accumImage, kernal):
-    # Setup Variables
-    x = p.wCenters[0]
-    y = p.wCenters[1]
-    eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
-    kernal = np.dot(kernal, 5)
+	# Setup Variables
+	x = p.wCenters[0]
+	y = p.wCenters[1]
+	eImg = np.zeros((accumImage.shape[0], accumImage.shape[1]), np.uint8)
+	kernal = np.dot(kernal, 5)
 
-    # Left and Top Check
-    if (x <= 0) or (y <= 0): return accumImage
-    if accumImage.shape[0] - y < 0: return accumImage
+	# Left and Top Check
+	if (x <= 0) or (y <= 0): return accumImage
+	if accumImage.shape[0] - y < 0: return accumImage
+	if accumImage.shape[1] - x < 0: return accumImage
 
-    # Bottom and Right Check
-    if (x > accumImage.shape[1]- int(np.floor(kernal.shape[1]/2)) -1) or (y > accumImage.shape[0]-int(np.floor(kernal.shape[0]/2)) - 1):
-        kernal = kernal[0: accumImage.shape[0]- y, 0: accumImage.shape[1]-x]
-        eImg[y - int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2)) + np.remainder(kernal.shape[0], 2), x - int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+ np.remainder(kernal.shape[1], 2)] = kernal
-    # Full Size
-    else:
-        eImg[y- int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2))+1, x-int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+1] = kernal
-   
-    
-    eImg = cv2.normalize(eImg, None, 0, 10, cv2.NORM_MINMAX)   
-    #accumImage = cv2.add(eImg, accumImage) # For Non-Normalised Image
-    accumImage = accumImage.astype(np.int)
-    accumImage = eImg + accumImage
-    return accumImage
+	# Bottom and Right Check
+	try:
+	
+		if (x > accumImage.shape[1]- int(np.floor(kernal.shape[1]/2)) -1) or (y > accumImage.shape[0]-int(np.floor(kernal.shape[0]/2)) - 1):
+			kernal = kernal[0: accumImage.shape[0]- y, 0: accumImage.shape[1]-x]
+			eImg[y - int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2)) + np.remainder(kernal.shape[0], 2), x - int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+ np.remainder(kernal.shape[1], 2)] = kernal
+		# Full Size
+		else:
+			eImg[y- int(np.floor(kernal.shape[0]/2)):y+int(np.floor(kernal.shape[0]/2))+1, x-int(np.floor(kernal.shape[1]/2)):x+int(np.floor(kernal.shape[1]/2))+1] = kernal
+				
+	except:
+		print("tracking error")
+		return accumImage
+
+	eImg = cv2.normalize(eImg, None, 0, 10, cv2.NORM_MINMAX)   
+	#accumImage = cv2.add(eImg, accumImage) # For Non-Normalised Image
+	accumImage = accumImage.astype(np.int)
+	accumImage = eImg + accumImage
+	return accumImage
 
 # Track only Court Objects
 def setROI(frame):
@@ -248,14 +255,25 @@ def main(videoFile, videoName, videoObject, noPlayers):
 	# cap = cv2.VideoCapture(0)
 	cap.set(cv2.CAP_PROP_FPS, 60)
 	success, frame = cap.read()
-	#frame = cv2.resize(frame, None, fx = 0.5, fy = 0.5, interpolation = cv2.INTER_AREA)
+
+	frame = cv2.resize(frame, (640, 360), interpolation = cv2.INTER_AREA)
 	# setup output video
 	width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
 	height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+	
 	processedVideoName = videoName + "Processed"
+	player1HeatMapVideoName = videoName + "player1HeatmapVideo"
+	player2HeatMapVideoName = videoName + "player2HeatmapVideo"
+	
 	processedVideoFilePath = 'media/processedVideos/' + videoName + '.mp4'	
-	processedVideo = cv2.VideoWriter(processedVideoFilePath,-1, 20.0, (int(width),int(height)))
-
+	player1HeatMapVideoPath = 'media/processedVideos/' + player1HeatMapVideoName + '.mp4'	
+	player2HeatMapVideoPath = 'media/processedVideos/' + player2HeatMapVideoName + '.mp4'	
+	
+	
+	processedVideo = cv2.VideoWriter(processedVideoFilePath,-1, 20.0, (int(width),int(height)))	
+	player1HeatMapVideo = cv2.VideoWriter(player1HeatMapVideoPath,-1, 20.0, (int(court.shape[1]),int(court.shape[0])))
+	player2HeatMapVideo = cv2.VideoWriter(player2HeatMapVideoPath,-1, 20.0, (int(court.shape[1]),int(court.shape[0])))
+	
 	player1HeatMapName = videoName + "player1Heatmap"
 	player1HeatMapPath = 'media/processedImages/' + player1HeatMapName + '.png'	
 	player1StringLineName = videoName + "player1StringLine"
@@ -280,15 +298,17 @@ def main(videoFile, videoName, videoObject, noPlayers):
 	setup = False
 	
 	trackVid = np.zeros((court.shape[0], court.shape[1]), np.uint8)
-	
+	pause = False
+	pressed = False
 	while True:
 		success, frame = cap.read()
 		if not success: break
-
+		
 		#Image Procssing
-		#frame = cv2.resize(frame, None, fx = 0.5, fy = 0.5, interpolation = cv2.INTER_AREA)
+		frame = cv2.resize(frame, (640, 360), interpolation = cv2.INTER_AREA)
 		HSVframe = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 		cFrame1 = copy.copy(frame)
+		cv2.imshow("OriginalFrame", frame)
 		if len(Players) >= noPlayers:
 			pNum = 1
 			
@@ -298,59 +318,74 @@ def main(videoFile, videoName, videoObject, noPlayers):
 					p.distTrav = copy.copy(court)
 				setup = True
 			
+			if keyboard.is_pressed('p'):
+				if not pressed:
+					pause = not pause
+					pressed = True
+			else:
+				pressed = False
+				
+			if(not pause):
+				for p in Players:
+					cFrame = copy.copy(frame)
 			
-			for p in Players:
-				cFrame = copy.copy(frame)
-		
-				
+					
 
-				Pframe = p.thresholdImage(HSVframe, 35)
-				Pframe = morph(Pframe)
-				Pframe = setROI(Pframe)
-				p.findContours(Pframe)
-				# Dev Tracking
-				Pframe = drawContours(cFrame, p)
-				
-				Pframe1 = p.thresholdImage(HSVframe, 35)
-				Pframe1 = morph(Pframe1)
-				Pframe1 = setROI(Pframe1)
-				p.findContours(Pframe1)				
-				Pframe1 = drawContours(cFrame1, p)
-				
-				# Warp Frame
-				p.warpPoint(h)
-				findControlPoints(p, T_CIRCLE)
+					Pframe = p.thresholdImage(HSVframe, 35)
+					Pframe = morph(Pframe)
+					Pframe = setROI(Pframe)
+					p.findContours(Pframe)
+					# Dev Tracking
+					Pframe = drawContours(cFrame, p)
+					
+					Pframe1 = p.thresholdImage(HSVframe, 35)
+					Pframe1 = morph(Pframe1)
+					Pframe1 = setROI(Pframe1)
+					p.findContours(Pframe1)				
+					Pframe1 = drawContours(cFrame1, p)
+					
+					# Warp Frame
+					p.warpPoint(h)
+					findControlPoints(p, T_CIRCLE)
 
-				# Generate Heatmap and Invert
-				p.accumImage = genHeatmap(p, p.accumImage, kernal)
-				normal = normalize(copy.copy(p.accumImage))       # Data is copied to preserve int datatype
-				normal = cv2.bitwise_not(normal)  
+					# Generate Heatmap and Invert
+					p.accumImage = genHeatmap(p, p.accumImage, kernal)
+					normal = normalize(copy.copy(p.accumImage))       # Data is copied to preserve int datatype
+					normal = cv2.bitwise_not(normal)  
 
-				# Add Heatmap to Court
-				heatmap = cv2.applyColorMap(normal, cv2.COLORMAP_HOT)
-				heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
+					# Add Heatmap to Court
+					heatmap = cv2.applyColorMap(normal, cv2.COLORMAP_HOT)
+					heatmap = cv2.addWeighted(heatmap, 0.6, court, 0.4, 0)
 
-				# Get Distance Travelled
-				p.getdistanceTraveledAYG(p.distTrav)
-				p.heatmap = heatmap
-				# HeatMap
-				# Display to User
-				cv2.imshow("Frame", Pframe1)
-				
-				if len(Players) == 2:
-				
-					if pNum == 1:
-						cv2.imshow("P1",  p.heatmap)
-					if pNum == 2:
-						cv2.imshow("P2", p.heatmap)
-					pNum = pNum + 1
-				else:
-					cv2.imshow("warp", p.heatmap)
-				# just to visually check findControlPoints is working
-				#cv2.imshow("Court", court)
+					# Get Distance Travelled
+					p.getdistanceTraveledAYG(p.distTrav)
+					p.heatmap = heatmap
+					# HeatMap
+					# Display to User
+					cv2.imshow("Frame", Pframe1)
+					print("processing")
+					if len(Players) == 2:
+					
+						if pNum == 1:
+							cv2.imshow("P1",  p.heatmap)
+							player1HeatMapVideo.write(p.heatmap)
+							
+						if pNum == 2:
+							cv2.imshow("P2", p.heatmap)
+							player2HeatMapVideo.write(p.heatmap)
+						pNum = pNum + 1
+					else:
+						cv2.imshow("warp", p.heatmap)
+						player1HeatMapVideo.write(p.heatmap)
+					# just to visually check findControlPoints is working
+					#cv2.imshow("Court", court)
 
-			# save output video
-			processedVideo.write(Pframe1)
+				# save output video
+				processedVideo.write(Pframe1)
+			else:
+				print("paused")
+				time.sleep(.02)
+			
 		else:
 			colours = chooseColours(HSVframe)
 			if colours:
@@ -382,6 +417,12 @@ def main(videoFile, videoName, videoObject, noPlayers):
 		pNum = pNum + 1
 		
 	processedVideo.release()
+	player1HeatMapVideo.release()
+	player2HeatMapVideo.release()
+	
+	player1HeatMapVideoPath = player1HeatMapVideoPath[5:]
+	player2HeatMapVideoPath = player2HeatMapVideoPath[5:]
+	
 	processedVideoFilePath = processedVideoFilePath[5:]
 	player1HeatMapPath = player1HeatMapPath[5:]
 	player1StringLinePath = player1StringLinePath[5:]
@@ -389,9 +430,11 @@ def main(videoFile, videoName, videoObject, noPlayers):
 	player2StringLinePath = player2StringLinePath[5:]
 	
 	
+	
+	
 	data = {'videoId': videoObject, 'name' : videoName, 'processedVideoFile' : processedVideoFilePath, 
-	'player1HeatMapImage' : player1HeatMapPath, 'player1StringLineImage' : player1StringLinePath,	'player1DistanceTravelled': player1DistanceTravelled, 'player1TimeInT' : player1TimeInT,
-	'player2HeatMapImage' : player2HeatMapPath, 'player2StringLineImage' : player2StringLinePath,	'player2DistanceTravelled': player2DistanceTravelled, 'player2TimeInT' : player2TimeInT,}
+	'player1HeatMapImage' : player1HeatMapPath, 'player1StringLineImage' : player1StringLinePath,	'player1DistanceTravelled': player1DistanceTravelled, 'player1TimeInT' : player1TimeInT, 'player1HeatMapVideo':player1HeatMapVideoPath,
+	'player2HeatMapImage' : player2HeatMapPath, 'player2StringLineImage' : player2StringLinePath,	'player2DistanceTravelled': player2DistanceTravelled, 'player2TimeInT' : player2TimeInT, 'player2HeatMapVideo':player2HeatMapVideoPath}
 	
 	videoData.objects.create(**data)
 if __name__ == "__main__":

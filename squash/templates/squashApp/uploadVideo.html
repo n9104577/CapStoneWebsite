@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+<html>
+	{% block head %}
+		<head>				
+			<title>Upload Videos</title>
+			<h1>Video Uploader</h1>
+		</head>
+	{% endblock %}
+
+	{% block body %}
+		<body>
+			<main>
+			<div class="form">
+				<h4>Please contact admin about registering new players</h4>
+				<form enctype="multipart/form-data" method="POST" action="">
+					{% csrf_token %}
+					<div class="split-row">
+						<div id="video_title" class="split-row">
+							{{ form.name }}
+						</div>
+					</div>
+					<br><br>
+					<div class="split-row">
+						<div class="field-wrap">
+							<label for="form.player1">
+								Name of Player 1:<span class="req">*</span>
+							</label>
+							{{ form.player1 }}
+						</div>
+						<br>
+						<div class="field-wrap">
+							<h4 id="h4_form">{{ form.player1Colour }}</h4>
+						</div>
+					</div>
+					
+					<div class="split-row">
+						<div class="field-wrap">
+							<label for="form.player1">
+								Name of Player 2:<span class="req">*</span>
+							</label>
+							{{ form.player2 }}
+						</div>
+						<br>
+						<div class="field-wrap">
+							<h4 id="h4_form">{{ form.player2Colour }}</h4>
+						</div>
+					</div>
+					
+					<div class="split-row">
+						<div class="field-wrap">
+							<label for="form.noPlayers">
+								Number of Players to be tracked::<span class="req">*</span>
+							</label>
+							{{ form.noPlayers }} 
+						</div>
+						<br><br>
+						<div class="field-wrap">
+							{{ form.videofile }}
+						</div>	
+					</div>
+					
+					
+					<button type="submit" class="button button-block" value="Upload" name="Upload"/>Upload</button>
+				</form>
+				<br><br>				
+			</div>
+		</main>
+		</body>
+	{% endblock %}
+</html>

@@ -11,7 +11,7 @@
 
 	{% block body %}
 		<body>
-			<h3> G'day {{user.get_username}}</h3>
+			<h3> G'day {{user.get_username}} ({{user.usertype}})</h3>
 			
 			<!-- Form for selecting player -->
 			<form class="form" method="POST">

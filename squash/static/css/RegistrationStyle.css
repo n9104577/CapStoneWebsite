@@ -32,30 +32,21 @@ img{
 h1  {
 	text-align: center;
 	color: #17252A; /*Color 1*/
-	margin: 0;	
-	font-size: 70px;
-	min-width: 400px;
+	font-size: 60px;
 }
 
-h2  {
-	text-align: center;
-	color: #17252A; /*Color 1*/
-	margin: 0;	
-	font-size: 48px;
-	letter-spacing: 4px;
-}
 
 h3  {
-	margin: 0 0 5px;
-	text-align: center;	
-	font-size: 30px;
+	
+	text-align: center;		
 	color: black;
+	font-size: 28px;
 }
 
 h4  {
 	text-align: center;
 	color: white;
-	font-size: 28px;
+	font-size: 30px;
 }
 #h4_form{
 	text-align: left;
@@ -78,49 +69,31 @@ h5{
 }
 
 
-.row:after {
-    content: "";
-    display: table;
-    clear: both;
-}
 .container {
     position: relative;
     text-align: center;
     color: white;
 }
 
-hr  {
-	display: block;
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
-	margin-left: auto;
-	margin-right: auto;
-	border-style: inset;
-	border-width: 2px;
-	border-color: #6e7f80;
-}
 
 *, *:before, *:after  {
 	box-sizing: border-box;
 }
 
-html  {
-	overflow-y: scroll;
-}
 
 body  {
 	background: #f7f7f7;
 	
 }
 
-a, .left  {
+a{
 	text-decoration:none;
-	
 	color: black;
 	transition:.5s ease;
 }
 
-a:hover, .left:hover  {
+
+a:hover{
 	color: #808080;
 }
 
@@ -136,79 +109,42 @@ a:hover, .left:hover  {
 #logout_link{
 	color: #eeeeee;
 }
-li  {
-	display: inline;
 
-	font-size: 24px;
-	border-radius: 3px;
+li  {
+	font-size: 22px;
+	border-radius: 2px;
+	display: inline;
+	
 }
+
 
 
 .link  {
 	color: black;
-	padding: 1px 10px 1px 10px;
+	padding: 1px 8px 1px 8px;
 }
 
-.button-container  {
-	position: relative;
-	text-align: center;
-	display: table;
-	margin: 0 auto;
-	padding-bottom: 20px;
-}
 
-.button-link  {
-	border: solid #393f44 1px; /*Color 4*/
-	position: relative;
-	border-radius: 100px;
-	display: block;
-	padding: auto;
-	background: #a0b3b0; /*Color 4*/
-	text-align: center;
-	
-	color: #a0b3b0;
-	font-size: 20px;
-}
 
-.button-group  {
-	list-style: none;
-	display: table;
-	margin: 0;
-	padding: 0;
-}
 
-.button-group li  {
-	display: table-cell;
-	position: relative;
-}
-
-.button-group li a:hover  {
-	background: #808080;
-	color: #ffffff; /*Color 2*/
-}
-
-input::placeholder  {
-	color: rgba(255, 255, 255, 0.5); /*Color 4*/
-}
 
 .drop-down  {
 	background-color: #585c65;/*Color 4*/
 	padding: 6px; 
 	color: #eeeeee; /*Color 5*/
 	float: right;
-	font-size: 20px;	
+	font-size: 18px;	
 }
+
 .searchPlayer{
 	float: left;
 	
 }
 
 footer  {
+	color: white;	
 	text-align: center;
-	background-color: #17252A;
-	color: white;
-	
-	
+	background-color: #17252A;	
 }
 
 
@@ -277,40 +213,23 @@ th {
  
  
 label  {
-	position: absolute;
-	left: 13px;
+	position: left;
+	left: 12px;
 	color: white;  /*Color 5*/
-	font-size: 22px;
+	font-size: 28px;
 }
 
-/* For edit page */
-#edit-block  {
-	padding-left:50px;
-	display: inline-block;
-	box-sizing: border-box;
-	width: 600px;
-}
 
-.edit-input  {
-	color: #2C4A52;
-}
 
-.edit-input::placeholder  {
-	color: #ACBEBE;
-}
 
-.edit-form-p  {
-	
-	font-size: 1.25rem;
-}
 
 .form  {
-	background: #17252A; /*Color 4*/
-	padding: 20px;
-	max-width: 600px;
-	margin: 20px auto;
+	background: #17252A; /*Color 4*/	
+	margin: 10px auto;
 	border-radius: 4px;
-	box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3); /*Color 4*/
+	box-shadow: 0 5px 5px 5px rgba(15, 30, 45, 0.5); /*Color 4*/
+	max-width: 700px;
+	padding: 15px;
 }
 
 .videoDataOutputs  {
@@ -319,7 +238,7 @@ label  {
 	max-width: 80%;
 	margin: 20px auto;
 	border-radius: 4px;
-	box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3); /*Color 4*/
+	box-shadow: 0 5px 5px 5px rgba(15, 30, 45, 0.5); /*Color 4*/
 }
 
 #video  {
@@ -330,7 +249,7 @@ label  {
 	margin: 20px auto;
 	
 	border-radius: 4px;
-	box-shadow: 0 4px 10px 4px rgba(19, 35, 47, 0.3); /*Color 4*/
+	box-shadow: 0 5px 5px 5px rgba(15, 30, 45, 0.5); /*Color 4*/
 	margin: 20px auto;
 }
 
@@ -357,73 +276,53 @@ label  {
 	border-left:5px solid rgba(19, 35, 47, 0.3);
 }
 
-/* For edit page */
-.edit-label  {
-	color: #52908B;
-	font-size: 22px;
-	padding-left: 50px;
-}
 
-label .req  {
-	margin: 2px;
-	color: #FEFFFF; /*Color 3*/
-}
 
-label.active  {
-	
-	transform: translateY(50px);
-	left: 2px;
-	font-size: 14px;
-}
 
-label.active .req  {
-	opacity: 0;
-}
 
-label.highlight  {
-	color: #ffffff;/*Color 2*/
-}
-
-input, textarea  {
-	font-size: 22px;
+input  {
+	font-size: 20px;
 	display: block;
+	
+	padding: 5px 10px;
+	
 	width: 100%;
 	height: 100%;
-	padding: 5px 10px;
+	
 	background: none;
-	border: 1px solid #a0b3b0;
+	border: 1px solid white;
 	color: #f7f7f7; /*Color 2*/
 	border-radius: 0;
 	
 }
 
-input:focus, textarea:focus  {
+input:focus{
 	outline: 0;
 	background: #585c65;  /*Color 4*/
 }
 
 
 .div-wrap  {
-	position: relative;
 	margin-bottom: 10px;
 	padding-bottom: 10px;
+	position: relative;
+	
 }
 
 
 .button  {
-	border: 0;
-	outline: none;
-	border-radius: 0;
-	padding: 10px 0;
-	font-size: 2rem;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: .1em;
+	
+	padding: 5px 0;	
+	font-size: 40px;	
+	text-transform: uppercase;	
 	background: #585c65; /*Color 3*/
 	color: #ffffff; /*Color 2*/
+	font-weight: 500;
+	border: 0;
+
 }
 
-.button:hover, .button:focus  {
+.button:hover {
 	background: #808080;
 }
 

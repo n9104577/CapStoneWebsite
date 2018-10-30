@@ -1,22 +1,10 @@
-/* 
-colour 1 f7f7f7 light
-colour 2 eeeeee
-colour 3 929aab
-colour 4 393e46 dark
- Dark
- #17252A
- #2B7A78
- #3AAFA9
- #DEF2F1
- #FEFFFF 
- Light
- 	#808080
-	585c65
- */
+
+/* main holding container  */ 
 main  {
 	min-width: 800px;
 }
 
+/* For images */
 img{
 	 max-width: 100%;
 	 height: auto;	
@@ -24,11 +12,14 @@ img{
 	 padding: 5px;
 }
 
+/* dont think this is needed */
 #picCol{
 	padding-left: 10px;
 	padding-right: 10px;
 }
 
+
+/* headings */
 h1  {
 	text-align: center;
 	color: #17252A; /*Color 1*/
@@ -59,23 +50,13 @@ h5{
 	
 }
 
+ /* login on registration page */
 .login {
 	color:#FEFFFF; /*Color 3*/
 }
 
-#mainColumn{
-	padding: 10px;
-	
-}
 
-
-.container {
-    position: relative;
-    text-align: center;
-    color: white;
-}
-
-
+ /* for the '*' in the form inputs*/
 *, *:before, *:after  {
 	box-sizing: border-box;
 }
@@ -83,9 +64,9 @@ h5{
 
 body  {
 	background: #f7f7f7;
-	
 }
 
+ /* nav bar and links */
 a{
 	text-decoration:none;
 	color: black;
@@ -113,21 +94,15 @@ a:hover{
 li  {
 	font-size: 22px;
 	border-radius: 2px;
-	display: inline;
-	
+	display: inline;	
 }
-
-
-
+ /*links, navbar */
 .link  {
 	color: black;
 	padding: 1px 8px 1px 8px;
 }
 
-
-
-
-
+ /* drop down selection in forms */
 .drop-down  {
 	background-color: #585c65;/*Color 4*/
 	padding: 6px; 
@@ -135,7 +110,7 @@ li  {
 	float: right;
 	font-size: 18px;	
 }
-
+ /* video selection page, serachplayer dropdown */
 .searchPlayer{
 	float: left;
 	
@@ -147,7 +122,7 @@ footer  {
 	background-color: #17252A;	
 }
 
-
+ /* Table formatting*/
 
 table  {
 	width: 80%;
@@ -179,6 +154,7 @@ th {
 	font-size: 25px;
 }
 
+
 /* Video Data table*/
 
 .videoDataTable  {
@@ -204,14 +180,14 @@ th {
 
 
 
+ /* for links in tables */
 .show{
 	font-size: 20px;
 	color: black;
 	font-style: bold;
 }
 
- 
- 
+ /* for labels */
 label  {
 	position: left;
 	left: 12px;
@@ -220,9 +196,7 @@ label  {
 }
 
 
-
-
-
+ /* forms*/
 .form  {
 	background: #17252A; /*Color 4*/	
 	margin: 10px auto;
@@ -231,6 +205,9 @@ label  {
 	max-width: 700px;
 	padding: 15px;
 }
+
+ /*video data page */
+
 
 .videoDataOutputs  {
 	
@@ -269,6 +246,7 @@ label  {
 .video_pro h4{
 	text-align: center;
 }
+
 #MidLeft{
 	border-right:5px solid rgba(19, 35, 47, 0.3);
 }
@@ -277,9 +255,7 @@ label  {
 }
 
 
-
-
-
+ /* text inputs for forms */
 input  {
 	font-size: 20px;
 	display: block;
@@ -293,7 +269,6 @@ input  {
 	border: 1px solid white;
 	color: #f7f7f7; /*Color 2*/
 	border-radius: 0;
-	
 }
 
 input:focus{
@@ -302,6 +277,7 @@ input:focus{
 }
 
 
+ /* for divs on everypage */
 .div-wrap  {
 	margin-bottom: 10px;
 	padding-bottom: 10px;
@@ -310,6 +286,7 @@ input:focus{
 }
 
 
+ /* for buttons  */
 .button  {
 	
 	padding: 5px 0;	
@@ -331,14 +308,8 @@ input:focus{
 	width: 100%;
 }
 
-#proccesedVideo{
-	max-width: 2000px;
-	
-}
-#pos{
-	padding-left: 560px;
-}
 
+ /* for form errors  */
 .error {
     padding: 10px;
     background-color: #ff0000;

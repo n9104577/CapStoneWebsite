@@ -1,0 +1,346 @@
+/* CSS Imports */
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+/* main holding container  */ 
+body  {
+	background: white;
+	text-align: center;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 25px;
+}
+
+/* Forms Extends */
+#nav_main {
+	padding-left: 10px;
+	float: left;
+}
+
+/* Forms Extends */
+#nav_logout {
+	float: right;
+}
+
+.title {
+	font-size: 55px;
+	font-weight: bold;
+}
+
+ /* login on registration page */	
+ .login {
+	color: white;
+}
+
+ /* links, navbar */
+ .link  {
+	color: black;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: bold;
+	font-size: 25px;
+	padding: 1px 8px 1px 8px;
+}	
+
+ /* forms*/
+ .form  {
+	background: #17252A; /*Color 4*/
+	margin: 10px auto;
+	border-radius: 4px;
+	box-shadow: 0 5px 5px 5px rgba(15, 30, 45, 0.5); /*Color 4*/
+	max-width: 700px;
+	padding: 10px;
+	font-size: 20px;
+ }
+
+  /* for labels */
+ label  {
+	position: left;
+	text-align: left;
+	left: 1px;
+	color: white;  /*Color 5*/
+	font-size: 20;
+}
+
+ /* for divs on everypage */
+ .div-wrap  {
+	text-align: left;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	position: relative;
+}
+
+/* Blold Line */
+hr {
+    border: none;
+	height: 4px;
+	
+    /* Set the hr color */
+    color: #333; /* old IE */
+    background-color: #333; /* Modern Browsers */
+}
+
+/* For images */
+img {
+	 max-width: 100%;
+	 height: auto;	
+	 width: auto/9;	
+	 padding: 5px;
+}
+
+/* dont think this is needed */
+#picCol {
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+
+/* headings */
+h1  {
+	color: #17252A; /*Color 1*/
+}
+
+h2 {
+	color: white;
+	font-size: 25px;
+}
+
+
+h3  {	
+	color: black;
+}
+
+h4  {
+	color: white;
+	text-align: left;	
+}
+
+#h4_form{
+	text-align: left;
+
+}
+
+h5{
+	color: white;
+}
+
+
+
+
+ /* for the '*' in the form inputs*/
+*, *:before, *:after  {
+	box-sizing: border-box;
+}
+
+
+
+ /* nav bar and links */
+a{
+	text-decoration:none;
+	color: black;
+	transition:.5s ease;
+}
+
+
+a:hover{
+	color: #808080;
+}
+
+
+
+
+#logout_link{
+	color: #eeeeee;
+}
+
+li  {
+	font-size: 22px;
+	border-radius: 2px;
+	display: inline;	
+}
+
+
+ /* drop down selection in forms */
+.drop-down  {
+	background-color: #585c65;/*Color 4*/
+	padding: 6px; 
+	color: #eeeeee; /*Color 5*/
+	float: right;
+	font-size: 18px;	
+}
+ /* video selection page, serachplayer dropdown */
+.searchPlayer{
+	float: left;
+	
+}
+
+footer  {
+	color: white;	
+	
+	background-color: #17252A;	
+}
+
+ /* Table formatting*/
+
+table  {
+	width: 80%;
+		
+	margin: 0 auto 20px auto;	
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+td, th{
+	
+	padding: 8px;
+	border-bottom: 1px solid black
+	
+}
+
+tr:nth-child(even){
+	background-color: #eeeeee;
+}
+tr:hover {
+	 background-color: #ddd;
+}
+
+th {
+	height: 50px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    
+    background-color:#585c65; 
+    color: white;
+	font-size: 25px;
+}
+
+
+/* Video Data table*/
+
+.videoDataTable  {
+	width: 100%;
+		
+	margin: 0 auto 20px auto;	
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+.videoDataTable td, th{
+	
+	padding: 8px;
+	border-bottom: unset;
+	
+}
+
+.videoDataTable tr:nth-child(even){
+	background-color: unset;
+}
+.videoDataTable tr:hover {
+	 background-color: unset;
+}
+
+
+
+ /* for links in tables */
+.show{
+	font-size: 20px;
+	color: black;
+	font-style: bold;
+}
+
+
+
+ /*video data page */
+
+
+.videoDataOutputs  {
+	
+	padding: 20px;
+	max-width: 80%;
+	margin: 20px auto;
+	border-radius: 4px;
+	box-shadow: 0 5px 5px 5px rgba(15, 30, 45, 0.5); /*Color 4*/
+}
+
+#video  {
+	position: center;
+	background: #17252A; /*Color 4*/
+	padding: 20px;
+	max-width: 1200px;
+	margin: 20px auto;
+	
+	border-radius: 4px;
+	box-shadow: 0 5px 5px 5px rgba(15, 30, 45, 0.5); /*Color 4*/
+	margin: 20px auto;
+}
+
+.video_div{
+	position: relative;
+	max-width: 560px;
+}
+.video_div h4{
+	
+	font-size: 50px;
+}
+
+.video_pro{
+	position: right;
+
+}
+
+#MidLeft{
+	border-right:5px solid rgba(19, 35, 47, 0.3);
+}
+#MidRight{
+	border-left:5px solid rgba(19, 35, 47, 0.3);
+}
+
+
+ /* text inputs for forms */
+input  {
+	font-size: 20px;
+	display: block;
+	
+	padding: 5px 10px;
+	
+	width: 100%;
+	height: 100%;
+	
+	background: none;
+	border: 1px solid white;
+	color: #f7f7f7; /*Color 2*/
+	border-radius: 0;
+}
+
+input:focus{
+	outline: 0;
+	background: #585c65;  /*Color 4*/
+}
+
+
+ /* for buttons  */
+.button  {
+	
+	padding: 5px 0;	
+	font-size: 40px;	
+	text-transform: uppercase;	
+	background: #585c65; /*Color 3*/
+	color: #ffffff; /*Color 2*/
+	font-weight: 500;
+	border: 0;
+
+}
+
+.button:hover {
+	background: #808080;
+}
+
+.button-block  {
+	display: block;
+	width: 100%;
+}
+
+
+ /* for form errors  */
+.error {
+    padding: 10px;
+    background-color: #ff0000;
+	
+    color: white;  
+	margin-bottom: 10px;
+}
